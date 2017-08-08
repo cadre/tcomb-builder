@@ -1,0 +1,10 @@
+*.swo
+*.swp
+.DS_Store
+
+dist/
+node_modules/
+reports/
+.idea
+.nyc_output/
+.eslintcache

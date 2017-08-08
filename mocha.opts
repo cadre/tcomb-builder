@@ -1,0 +1,4 @@
+--ui bdd
+--reporter nyan
+--require babel-register
+--require testUtils.js

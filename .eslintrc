@@ -1,0 +1,33 @@
+{
+  "extends": "airbnb-base",
+  "env": {
+    "browser": true,
+    "jasmine": true,
+    "mocha": true,
+    "node": true
+  },
+  "globals": {
+    "assert": true,
+    "require": false,
+    "should": true,
+    "sinon": true
+  },
+  "parser": "babel-eslint",
+  "plugins": [
+    "babel"
+  ],
+  "rules": {
+    "arrow-parens": ['error', 'as-needed'],
+    "import/prefer-default-export": 0,
+    "import/no-extraneous-dependencies": ['error', {
+      devDependencies: ['testUtils.js']
+    }],
+    "new-cap": 0,
+    "max-len": [2, 100, 2, {
+      "ignoreUrls": true,
+      "ignoreComments": false
+    }],
+    "no-unused-expressions": 0,
+    "no-underscore-dangle": 0
+  }
+}
