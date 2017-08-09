@@ -3248,7 +3248,7 @@ tar@~2.2.1:
     fstream "^1.0.2"
     inherits "2"
 
-tcomb-validation@^3.4.0:
+tcomb-validation@3.4.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/tcomb-validation/-/tcomb-validation-3.4.0.tgz#c8816fa9be4192b2c2c36ba629568adfac7e181a"
   dependencies:
