@@ -1,0 +1,27 @@
+version: 2
+jobs:
+  build:
+    working_directory: /home/circleci/tcomb-builder
+    docker:
+      - image: circleci/node:7.10
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+      - run: yarn install
+      - save_cache:
+          key: v1-dependencies-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+      - run: yarn run test:junit
+      - store_artifacts:
+          path: ./reports/junit-report.xml
+          prefix: tests
+      - store_artifacts:
+          path: ./reports/coverage/cobertura-coverage.xml
+          prefix: coverage
+      - store_test_results:
+          path: ./reports/junit-report.xml
