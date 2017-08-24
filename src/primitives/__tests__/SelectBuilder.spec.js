@@ -1,12 +1,10 @@
-import tcomb from 'tcomb-validation';
-
 import SelectBuilder from '../SelectBuilder';
 
 const testSelect = SelectBuilder
-  .setTypeAndValidate(tcomb.enums({ dog: 'Dog', cat: 'Cat' }));
+  .setChoices({ dog: 'Dog', cat: 'Cat' });
 
 const trueFalseSelect = SelectBuilder
-  .setTypeAndValidate(tcomb.enums.of([true, false]));
+  .setChoices([true, false]);
 
 describe('SelectBuilder', () => {
   it('should validate input properly', () => {
