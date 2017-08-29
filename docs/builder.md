@@ -139,7 +139,7 @@ const field = new BaseBuilder()
 
 **error**: `(value, path, context) => ?(string | ReactElement)`
 
-## `setValidationErrorMessageFn(error)`
+## `addValidationErrorMessageFn(error)`
 
 ### Summary
 
