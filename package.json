@@ -30,6 +30,7 @@
   "author": "Cadre <tcomb-builder@cadre.com>",
   "dependencies": {
     "immutable": "^3.8.1",
+    "invariant": "^2.2.0",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
     "validator": "^8.0.0"
@@ -47,7 +48,6 @@
     "eslint-config-airbnb-base": "11.3.1",
     "eslint-plugin-babel": "4.1.2",
     "eslint-plugin-import": "2.7.0",
-    "invariant": "2.2.0",
     "mocha": "3.5.0",
     "mocha-junit-reporter": "1.13.0",
     "nodemon": "1.11.0",

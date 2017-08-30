@@ -1,9 +1,8 @@
 import invariant from 'invariant';
 
-import BaseBuilder from '../BaseBuilder';
 import SelectBuilder from '../primitives/SelectBuilder';
 
-class RadioBuilder extends BaseBuilder {
+class RadioBuilder extends SelectBuilder.constructor {
   /**
    * Set the layout of the radio group to either 'horizontal' or 'vertical.'
    * The template should use this to configure how to layout the buttons.

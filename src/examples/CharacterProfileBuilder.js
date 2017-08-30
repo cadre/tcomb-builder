@@ -1,4 +1,4 @@
-import { primitives, validators, widgets } from '../index';
+import { validators, widgets } from '../index';
 
 const name = widgets.TextBuilder.setLabel('Name');
 
@@ -33,9 +33,9 @@ const foodGroup = widgets.CheckboxGroupBuilder
   .setLabel('Character Traits')
   .setField(noneKey, none);
 
-export default primitives.StructBuilder
+export default widgets.StructBuilder
   .setField('name', name)
   .setField('dateOfBirth', dateOfBirth)
   .setField('occupation', occupation)
   .setField('foodGroup', foodGroup)
-  .setLazyTemplateFactory(provider => provider.getDoubleColumn());
+  .setColumns(2);
