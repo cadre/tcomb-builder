@@ -29,4 +29,22 @@ describe('StructBuilder', () => {
     expect(actual.fields.second.label).to.equal(expected.fields.second.label);
     expect(actual.order).to.deep.equal(expected.order);
   });
+
+  describe('setVerticalRhythm()', () => {
+    it('can set rhythm option to the field\'s config option', () => {
+      const rhythm = 20;
+      const builder = StructBuilder.setVerticalRhythm(rhythm);
+
+      expect(builder.getOptions().config).to.deep.equal({ rhythm: 20 });
+    });
+  });
+
+  describe('setColumns()', () => {
+    it('can set columns option to the field\'s config option', () => {
+      const columns = 2;
+      const builder = StructBuilder.setColumns(columns);
+
+      expect(builder.getOptions().config).to.deep.equal({ columns: 2 });
+    });
+  });
 });
