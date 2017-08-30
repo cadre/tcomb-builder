@@ -9,7 +9,7 @@ export const length = max => value => {
 };
 
 export const nonEmpty = value => (
-  (!value || typeof value !== 'string' || !value.length) ? 'Please provide a value' : null
+  (!value || typeof value !== 'string' || !value.length) ? 'Required' : null
 );
 
 export const isEmail = value => (

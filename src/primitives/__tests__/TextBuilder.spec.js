@@ -15,6 +15,6 @@ describe('TextBuilder', () => {
   it('produces a TextType options object that is formed correctly', () => {
     const options = TextBuilder.getOptions();
     expect(options.error('banana')).to.equal(null);
-    expect(options.error(null)).to.equal('Please provide a value');
+    expect(options.error(null)).to.equal('Required');
   });
 });
