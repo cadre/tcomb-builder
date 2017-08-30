@@ -2,10 +2,11 @@ import Immutable from 'immutable';
 
 // Structs
 const CHECKBOX_GROUP = 'checkbox group';
-const SINGLE_COLUMN = 'single column';
 const DOUBLE_COLUMN = 'double column';
 const FORM_PAGE = 'form page';
+const SINGLE_COLUMN = 'single column';
 const STATIC_PAGE = 'static page';
+const STRUCT = 'struct';
 
 // Components
 const CHECKBOX = 'checkbox';
@@ -46,6 +47,7 @@ export default class LazyTemplateProvider {
   getRadio() { return this._getField(RADIO); }
   getSingleColumn() { return this._getField(SINGLE_COLUMN); }
   getStaticPage() { return this._getField(STATIC_PAGE); }
+  getStruct() { return this._getField(STRUCT); }
   getTextArea() { return this._getField(TEXT_AREA); }
   getTextField() { return this._getField(TEXT_FIELD); }
   getVerticalRadio() { return this._getField(VERTICAL_RADIO); }
@@ -59,6 +61,7 @@ export default class LazyTemplateProvider {
   setRadio(factory) { return this._setField(RADIO, factory); }
   setSingleColumn(factory) { return this._setField(SINGLE_COLUMN, factory); }
   setStaticPage(factory) { return this._setField(STATIC_PAGE, factory); }
+  setStruct(factory) { return this._setField(STRUCT, factory); }
   setTextField(factory) { return this._setField(TEXT_FIELD, factory); }
   setTextArea(factory) { return this._setField(TEXT_AREA, factory); }
   setVerticalRadio(factory) { return this._setField(VERTICAL_RADIO, factory); }

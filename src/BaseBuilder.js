@@ -317,6 +317,16 @@ export default class BaseBuilder {
   }
 
   /**
+   * HELPER: Sets the theme in the config blob.
+   *
+   * @param {string} theme
+   * @return {Builder}
+   */
+  setTheme(theme) {
+    return this.setConfig({ theme });
+  }
+
+  /**
    * Return a realized type. Lazily realize the type so that the most recent
    * versions of the `error` function and `_fieldBuilders` object are
    * available.

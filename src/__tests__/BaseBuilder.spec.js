@@ -57,6 +57,15 @@ describe('BaseBuilder', () => {
       });
     });
 
+    describe('setTheme()', () => {
+      it('can set theme options to the field\'s config option', () => {
+        const theme = 'light';
+        const builder = new BaseBuilder().setTheme(theme);
+
+        expect(builder.getOptions().config).to.deep.equal({ theme: 'light' });
+      });
+    });
+
     describe('setValue()', () => {
       it('can set a label option field', () => {
         const builder = new BaseBuilder().setValue('foobar');

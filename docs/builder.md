@@ -329,6 +329,17 @@ pass-through for setting props on the underlying template.
 
 **config**: `object`
 
+## `setTheme(config)`
+
+### Summary
+
+Set the theme in the config object for this type. It is the responsibility
+of the template to handle styling.
+
+### Parameters
+
+**theme**: `string`
+
 ## `_disableTemplates()`
 
 ### Summary
