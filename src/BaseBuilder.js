@@ -327,6 +327,19 @@ export default class BaseBuilder {
   }
 
   /**
+   * HELPER: Sets an error message in the config blob. Note, this is different
+   * from the validation error message. The error in the config blob should be
+   * used for passing in external errors, such as from an API request. It is
+   * up to the templates to handle this message separately.
+   *
+   * @param {string|array} error
+   * @return {Builder}
+   */
+  setError(error) {
+    return this.setConfig({ error });
+  }
+
+  /**
    * Return a realized type. Lazily realize the type so that the most recent
    * versions of the `error` function and `_fieldBuilders` object are
    * available.

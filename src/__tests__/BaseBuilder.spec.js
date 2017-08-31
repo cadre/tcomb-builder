@@ -77,6 +77,15 @@ describe('BaseBuilder', () => {
       });
     });
 
+    describe('setError()', () => {
+      it('can set error to the field\'s config option', () => {
+        const error = 'This email already exists in the database';
+        const builder = new BaseBuilder().setError(error);
+
+        expect(builder.getOptions().config).to.deep.equal({ error });
+      });
+    });
+
     describe('setValue()', () => {
       it('can set a label option field', () => {
         const builder = new BaseBuilder().setValue('foobar');
