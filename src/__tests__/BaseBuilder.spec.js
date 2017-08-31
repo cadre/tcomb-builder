@@ -55,6 +55,17 @@ describe('BaseBuilder', () => {
 
         expect(builder.getOptions().config).to.deep.equal(config);
       });
+
+      it('can set multiple options in the field\'s config option', () => {
+        const builder = new BaseBuilder()
+          .setConfig({ prop1: '1' })
+          .setConfig({ prop2: '2' });
+
+        expect(builder.getOptions().config).to.deep.equal({
+          prop1: '1',
+          prop2: '2',
+        });
+      });
     });
 
     describe('setTheme()', () => {
