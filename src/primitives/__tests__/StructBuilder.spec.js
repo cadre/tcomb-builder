@@ -30,15 +30,6 @@ describe('StructBuilder', () => {
     expect(actual.order).to.deep.equal(expected.order);
   });
 
-  describe('setVerticalRhythm()', () => {
-    it('can set rhythm option to the field\'s config option', () => {
-      const rhythm = 20;
-      const builder = StructBuilder.setVerticalRhythm(rhythm);
-
-      expect(builder.getOptions().config).to.deep.equal({ rhythm: 20 });
-    });
-  });
-
   describe('setColumns()', () => {
     it('can set columns option to the field\'s config option', () => {
       const columns = 2;
