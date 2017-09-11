@@ -276,8 +276,8 @@ export default class BaseBuilder {
    *
    * @return {Builder}
    */
-  makeOptional(optional = true) {
-    return new this.constructor(this._state.set('_isOptional', optional));
+  makeOptional(isOptional = true) {
+    return new this.constructor(this._state.set('_isOptional', isOptional));
   }
 
   /**

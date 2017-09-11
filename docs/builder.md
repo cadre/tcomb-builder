@@ -1,6 +1,6 @@
 # Base Type Builder
 
-## `setDisabled(disabled)`
+## `setDisabled(disabled = true)`
 
 ### Summary
 
@@ -267,7 +267,7 @@ sub-field options objects.
 
 **provider**: `LazyTemplateProvider`
 
-## `makeOptional()`
+## `makeOptional(isOptional = true)`
 
 ### Summary
 
