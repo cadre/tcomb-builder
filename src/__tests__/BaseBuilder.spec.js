@@ -1,6 +1,9 @@
 import tcomb from 'tcomb-validation';
 
 import BaseBuilder from '../BaseBuilder';
+import UnionBuilder from '../primitives/UnionBuilder';
+import StructBuilder from '../primitives/StructBuilder';
+import TextBuilder from '../primitives/TextBuilder';
 
 describe('BaseBuilder', () => {
   describe('getOptions()', () => {
@@ -340,6 +343,41 @@ describe('BaseBuilder', () => {
   });
 
   describe('getType()', () => {
+    context('a union has been defined', () => {
+      it('returns a union type', () => {
+        const world = StructBuilder
+          .setField('country', TextBuilder);
+        const usa = StructBuilder
+          .setField('country', TextBuilder)
+          .setField('state', TextBuilder);
+        const countriesBuilder = UnionBuilder
+          .setUnion([world, usa])
+          .setDispatch(value => (
+            value.country === 'usa'
+              ? usa.getType()
+              : world.getType()
+          ));
+        const Country = countriesBuilder.getType();
+        Country({ country: 'usa', state: 'california' });
+        const options = countriesBuilder.getOptions();
+        console.log(options);
+      });
+
+      describe('dispatch method', () => {
+        it('can be valid', () => {
+
+        });
+
+        it('throws when the union does not contain a value', () => {
+
+        });
+
+        it('throws when an invalid type identifier is supplied', () => {
+
+        });
+      });
+    });
+
     context('no sub-fields have been set', () => {
       context('no error message has been set', () => {
         it('returns the type of the current builder', () => {
