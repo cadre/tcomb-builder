@@ -355,7 +355,7 @@ for telling the template how much padding to put around the component.
 
 ### Summary
 
-Set the order in the optionscobject for this type. The order is either
+Set the order in the options object for this type. The order is either
 'asc' or 'desc'.
 
 ### Parameters
