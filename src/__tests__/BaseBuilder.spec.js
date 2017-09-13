@@ -34,6 +34,18 @@ describe('BaseBuilder', () => {
       });
     });
 
+    describe('setOrder()', () => {
+      it('can set order option on builder', () => {
+        const builder = new BaseBuilder().setOrder('asc');
+
+        expect(builder.getOptions()).to.deep.equal({ order: 'asc' });
+      });
+
+      it('throws error if order is not asc or desc', () => {
+        expect(() => new BaseBuilder().setOrder('foo')).to.throw();
+      });
+    });
+
     describe('setAutoFocus()', () => {
       it('can set an autofocus option', () => {
         const builder = new BaseBuilder().setAutoFocus(true);
@@ -74,6 +86,15 @@ describe('BaseBuilder', () => {
         const builder = new BaseBuilder().setTheme(theme);
 
         expect(builder.getOptions().config).to.deep.equal({ theme: 'light' });
+      });
+    });
+
+    describe('setVerticalRhythm()', () => {
+      it('can set rhythm option to the field\'s config option', () => {
+        const rhythm = 20;
+        const builder = new BaseBuilder().setVerticalRhythm(rhythm);
+
+        expect(builder.getOptions().config).to.deep.equal({ rhythm: 20 });
       });
     });
 

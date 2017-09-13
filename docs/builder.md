@@ -1,6 +1,6 @@
 # Base Type Builder
 
-## `setDisabled(disabled)`
+## `setDisabled(disabled = true)`
 
 ### Summary
 
@@ -267,7 +267,7 @@ sub-field options objects.
 
 **provider**: `LazyTemplateProvider`
 
-## `makeOptional()`
+## `makeOptional(isOptional = true)`
 
 ### Summary
 
@@ -329,7 +329,7 @@ pass-through for setting props on the underlying template.
 
 **config**: `object`
 
-## `setTheme(config)`
+## `setTheme(theme)`
 
 ### Summary
 
@@ -339,6 +339,28 @@ of the template to handle styling.
 ### Parameters
 
 **theme**: `string`
+
+## `setVerticalRhythm(rhythm)`
+
+### Summary
+
+Set the rhythm in the config object for this type. This value should be used
+for telling the template how much padding to put around the component.
+
+### Parameters
+
+**rhythm**: `string`
+
+## `setOrder(order)`
+
+### Summary
+
+Set the order in the options object for this type. The order is either
+'asc' or 'desc'.
+
+### Parameters
+
+**order**: `string`
 
 ## `_disableTemplates()`
 

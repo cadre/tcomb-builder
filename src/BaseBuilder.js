@@ -1,4 +1,5 @@
 import Immutable from 'immutable';
+import invariant from 'invariant';
 import tcomb from 'tcomb-validation';
 
 import { validation } from './combinators';
@@ -38,7 +39,7 @@ export default class BaseBuilder {
    * @param {boolean} disabled
    * @return {Builder}
    */
-  setDisabled(disabled) {
+  setDisabled(disabled = true) {
     return new this.constructor(this._state.mergeDeep({ options: { disabled } }));
   }
 
@@ -138,6 +139,20 @@ export default class BaseBuilder {
    */
   setTransformer(transformer) {
     return new this.constructor(this._state.mergeDeep({ options: { transformer } }));
+  }
+
+  /**
+   * Set the order in the options object for this type.
+   *
+   * @param {transformer} order
+   * @return {Builder}
+   */
+  setOrder(order) {
+    invariant(
+      ['asc', 'desc'].indexOf(order) !== -1,
+      'Order must be either \'asc\' or \'desc\'',
+    );
+    return new this.constructor(this._state.mergeDeep({ options: { order } }));
   }
 
   /**
@@ -261,8 +276,8 @@ export default class BaseBuilder {
    *
    * @return {Builder}
    */
-  makeOptional() {
-    return new this.constructor(this._state.set('_isOptional', true));
+  makeOptional(isOptional = true) {
+    return new this.constructor(this._state.set('_isOptional', isOptional));
   }
 
   /**
@@ -324,6 +339,18 @@ export default class BaseBuilder {
    */
   setTheme(theme) {
     return this.setConfig({ theme });
+  }
+
+  /**
+   * Set the vertical rhythm in the config blob. The template should
+   * use this to configure how much vertical spacing should be between
+   * each individual component.
+   *
+   * @param {number} rhythm
+   * @return {Builder}
+   */
+  setVerticalRhythm(rhythm) {
+    return this.setConfig({ rhythm });
   }
 
   /**
