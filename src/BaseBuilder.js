@@ -371,7 +371,10 @@ export default class BaseBuilder {
 
         const unionBuilders = this._state.get('_unionBuilders');
         const union = tcomb.union(unionBuilders.map(builder => builder.getType()).toJS());
-        union.dispatch = this._state.get('_unionDispatch');
+
+        // When setting a dispatch function on the builder, return a builder.
+        // Here, take that builder and convert it into a type.
+        union.dispatch = value => this._state.get('_unionDispatch')(value).getType();
         return union;
       }
 

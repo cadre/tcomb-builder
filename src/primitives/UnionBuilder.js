@@ -10,11 +10,15 @@ class UnionBuilder extends BaseBuilder {
    * @param {StructBuilder[]} union - List of builders in the union
    */
   setUnion(union) {
-    if (!this._state.get('_fieldBuilders').isEmpty()) {
-      throw new Error('Cannot set a union on a builder with fields.');
-    }
-
     return new this.constructor(this._state.set('_unionBuilders', Immutable.List(union)));
+  }
+
+  /**
+   * Setting fields is not allowed on a UnionBuilder.
+   */
+  // eslint-disable-next-line class-methods-use-this
+  setField() {
+    throw new Error('Setting fields is not allowed on a UnionBuilder.');
   }
 
   /**
