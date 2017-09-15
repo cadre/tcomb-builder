@@ -26,6 +26,8 @@ const initialState = {
 
   // Directly returned from the builder.
   options: Immutable.Map(),
+
+  _unionBuilders: Immutable.List(),
 };
 
 export default class BaseBuilder {
@@ -362,6 +364,20 @@ export default class BaseBuilder {
    */
   getType() {
     const type = () => {
+      if (!this._state.get('_unionBuilders').isEmpty()) {
+        if (!this._state.has('_dispatch')) {
+          throw new Error('No dispatch function found for union type');
+        }
+
+        const unionBuilders = this._state.get('_unionBuilders');
+        const union = tcomb.union(unionBuilders.map(builder => builder.getType()).toJS());
+
+        // When setting a dispatch function on the builder, return a builder.
+        // Here, take that builder and convert it into a type.
+        union.dispatch = value => this._state.get('_dispatch')(value).getType();
+        return union;
+      }
+
       if (this._state.get('_fieldBuilders').isEmpty()) {
         return this._state.get('_type')(this._state.getIn(['options', 'error']));
       }
@@ -398,6 +414,15 @@ export default class BaseBuilder {
     } = config;
 
     const provider = lazyTemplateProvider || this._state.get('_lazyTemplateProvider');
+
+    const unionBuilders = this._state.get('_unionBuilders');
+    if (!unionBuilders.isEmpty()) {
+      return this._state
+        .get('options')
+        .set('item', unionBuilders.reduce((acc, builder) =>
+          acc.push(builder.getOptions(provider)), Immutable.List()))
+        .toJS();
+    }
 
     const hasConcreteTemplateFactory = this._state.hasIn(['options', 'factory']);
 
