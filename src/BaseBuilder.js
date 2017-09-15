@@ -365,7 +365,7 @@ export default class BaseBuilder {
   getType() {
     const type = () => {
       if (!this._state.get('_unionBuilders').isEmpty()) {
-        if (!this._state.has('_unionDispatch')) {
+        if (!this._state.has('_dispatch')) {
           throw new Error('No dispatch function found for union type');
         }
 
@@ -374,7 +374,7 @@ export default class BaseBuilder {
 
         // When setting a dispatch function on the builder, return a builder.
         // Here, take that builder and convert it into a type.
-        union.dispatch = value => this._state.get('_unionDispatch')(value).getType();
+        union.dispatch = value => this._state.get('_dispatch')(value).getType();
         return union;
       }
 

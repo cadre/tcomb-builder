@@ -5,15 +5,15 @@ import TextBuilder from '../TextBuilder';
 describe('UnionBuilder', () => {
   describe('setUnion and setDispatch', () => {
     it('should create a valid union type', () => {
-      const world = StructBuilder
+      const international = StructBuilder
         .setField('country', TextBuilder);
       const usa = StructBuilder
         .setField('country', TextBuilder)
         .setField('state', TextBuilder);
       const countriesBuilder = UnionBuilder
-        .setUnion([world, usa])
+        .setUnion([international, usa])
         .setDispatch(value => (
-          value.country === 'usa' ? usa : world
+          value.country === 'usa' ? usa : international
         ));
       const Country = countriesBuilder.getType();
       expect(() => Country({ country: 'usa', state: 'california' })).to.not.throw();

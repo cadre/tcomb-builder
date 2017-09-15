@@ -16,7 +16,6 @@ class UnionBuilder extends BaseBuilder {
   /**
    * Setting fields is not allowed on a UnionBuilder.
    */
-  // eslint-disable-next-line class-methods-use-this
   setField() {
     throw new Error('Setting fields is not allowed on a UnionBuilder.');
   }
@@ -30,7 +29,7 @@ class UnionBuilder extends BaseBuilder {
    * @param {function} dispatch
    */
   setDispatch(dispatch) {
-    return new this.constructor(this._state.set('_unionDispatch', dispatch));
+    return new this.constructor(this._state.set('_dispatch', dispatch));
   }
 }
 
