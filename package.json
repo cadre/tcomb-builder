@@ -1,6 +1,6 @@
 {
   "name": "tcomb-builder",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "A declarative syntax for building Tcomb type and options objects",
   "main": "dist/index.js",
   "license": "Apache-2.0",

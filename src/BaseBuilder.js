@@ -370,11 +370,20 @@ export default class BaseBuilder {
         }
 
         const unionBuilders = this._state.get('_unionBuilders');
-        const union = tcomb.union(unionBuilders.map(builder => builder.getType()).toJS());
+
+        const unionTypes = unionBuilders.map(builder => builder.getType());
+        const union = tcomb.union(unionTypes.toJS());
 
         // When setting a dispatch function on the builder, return a builder.
         // Here, take that builder and convert it into a type.
-        union.dispatch = value => this._state.get('_dispatch')(value).getType();
+        union.dispatch = value => {
+          const dispatchedBuilder = this._state.get('_dispatch')(value);
+          const typeIndex = unionBuilders.indexOf(dispatchedBuilder);
+          if (typeIndex === -1) {
+            throw new Error('Dispatched builder was not found within the union set');
+          }
+          return unionTypes.get(typeIndex);
+        };
         return union;
       }
 
@@ -417,11 +426,8 @@ export default class BaseBuilder {
 
     const unionBuilders = this._state.get('_unionBuilders');
     if (!unionBuilders.isEmpty()) {
-      return this._state
-        .get('options')
-        .set('item', unionBuilders.reduce((acc, builder) =>
-          acc.push(builder.getOptions(provider)), Immutable.List()))
-        .toJS();
+      return unionBuilders.reduce((acc, builder) =>
+        acc.push(builder.getOptions(provider)), Immutable.List()).toJS();
     }
 
     const hasConcreteTemplateFactory = this._state.hasIn(['options', 'factory']);
