@@ -259,7 +259,8 @@ export default class BaseBuilder {
   setTypeAndValidate(type, name) {
     return this.setType(errorFn => {
       if (!errorFn) {
-        throw new Error('validationErrorMessageFn was not supplied for the given type');
+        throw new Error('You called setTypeAndValidate without setting an '
+        + 'validationErrorMessageFn');
       }
       return validation(type, errorFn, name);
     });
@@ -395,6 +396,9 @@ export default class BaseBuilder {
       if (this._state.get('_fieldBuilders').isEmpty()) {
         const Type = this._state.get('_type');
         const validationErrorMessageFn = this._state.getIn(['options', 'error']);
+        if (!Type) {
+          throw new Error('No type was set for the current builder');
+        }
         return Type(validationErrorMessageFn);
       }
 

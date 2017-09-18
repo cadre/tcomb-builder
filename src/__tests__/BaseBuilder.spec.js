@@ -356,6 +356,11 @@ describe('BaseBuilder', () => {
 
           expect(builder.getType()).to.equal('foobar');
         });
+
+        it('throws when no type has been set', () => {
+          const builder = new BaseBuilder();
+          expect(() => builder.getType()).to.throw();
+        });
       });
 
       context('an error message has been set', () => {
