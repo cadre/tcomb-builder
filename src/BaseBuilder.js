@@ -259,7 +259,7 @@ export default class BaseBuilder {
   setTypeAndValidate(type, name) {
     return this.setType(errorFn => {
       if (!errorFn) {
-        throw new Error('You called setTypeAndValidate without setting an '
+        throw new Error('You called setTypeAndValidate without setting a '
         + 'validationErrorMessageFn');
       }
       return validation(type, errorFn, name);
