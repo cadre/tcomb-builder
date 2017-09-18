@@ -368,6 +368,13 @@ describe('BaseBuilder', () => {
 
           expect(calledError).to.be.true;
         });
+
+        it('requires an error message to be set before validation', () => {
+          const builder = new BaseBuilder()
+            .setTypeAndValidate(tcomb.Any, 'myType');
+
+          expect(() => builder.getType()).to.throw();
+        });
       });
     });
 
