@@ -1,3 +1,7 @@
+[![CircleCI](https://img.shields.io/circleci/project/github/cadre/tcomb-builder.svg?style=flat-square)](https://circleci.com/gh/cadre/tcomb-builder)
+[![dependency status](https://img.shields.io/david/cadre/tcomb-builder.svg?style=flat-square)](https://david-dm.org/cadre/tcomb-builder)
+![npm downloads](https://img.shields.io/npm/dm/tcomb-builder.svg?style=flat-square)
+
 # Tcomb Form Builder
 
 ## Install
@@ -48,8 +52,8 @@ import * as validators from '../validators';
 const validation = validators.text.nonEmpty;
 
 const TextBuilder = new BaseBuilder()
-    .setTypeAndValidate(tcomb.String, 'Text')
-    .setValidationErrorMessageFn(validation);
+  .setTypeAndValidate(tcomb.String, 'Text')
+  .setValidationErrorMessageFn(validation);
 
 const name = TextBuilder.setLabel('Name');
 
@@ -117,21 +121,21 @@ import { primitives, validators, widgets } from '../index';
 const name = widgets.TextBuilder.setLabel('Name');
 
 const dateOfBirth = widgets.TextBuilder
-    .setValidationErrorMessageFn(validators.date.birthdate)
-    .setLabel('Date of Birth');
+  .setValidationErrorMessageFn(validators.date.birthdate)
+  .setLabel('Date of Birth');
 
 const occupation = widgets.TextBuilder
-    .setLabel('Occupation')
-    .makeOptional();
+  .setLabel('Occupation')
+  .makeOptional();
 
 const bananaStand = widgets.CheckboxBuilder
-    .setLabel('Worked at banana stand');
+  .setLabel('Worked at banana stand');
 const chickenDance = widgets.CheckboxBuilder
-    .setLabel('Does chicken dance');
+  .setLabel('Does chicken dance');
 const hugeMistake = widgets.CheckboxBuilder
-    .setLabel('Has made a huge mistake');
+  .setLabel('Has made a huge mistake');
 const none = widgets.CheckboxBuilder
-    .setLabel('None of the above');
+  .setLabel('None of the above');
 
 const noneKey = 'isNone';
 const crossValidation = validators.combine([
@@ -140,20 +144,19 @@ const crossValidation = validators.combine([
 ]);
 
 const foodGroup = widgets.CheckboxGroupBuilder
-    .setValidationErrorMessageFn(crossValidation)
-    .setField('bananaStand', bananaStand)
-    .setField('chickenDance', chickenDance)
-    .setField('hugeMistake', hugeMistake)
-    .setLabel('Character Traits')
-    .setField(noneKey, none);
+  .setValidationErrorMessageFn(crossValidation)
+  .setField('bananaStand', bananaStand)
+  .setField('chickenDance', chickenDance)
+  .setField('hugeMistake', hugeMistake)
+  .setLabel('Character Traits')
+  .setField(noneKey, none);
 
 export default widgets.StructBuilder
-    .setField('name', name)
-    .setField('dateOfBirth', dateOfBirth)
-    .setField('occupation', occupation)
-    .setField('foodGroup', foodGroup)
-    .setColumns(2);
-```
+  .setField('name', name)
+  .setField('dateOfBirth', dateOfBirth)
+  .setField('occupation', occupation)
+  .setField('foodGroup', foodGroup)
+  .setColumns(2);
 
 Once exported, the page builder provides us with its tcomb type and options
 blob, which can be passed directly to
