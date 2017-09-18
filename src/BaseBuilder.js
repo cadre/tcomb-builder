@@ -257,7 +257,13 @@ export default class BaseBuilder {
    * @return {Builder}
    */
   setTypeAndValidate(type, name) {
-    return this.setType(errorFn => validation(type, errorFn, name));
+    return this.setType(errorFn => {
+      if (!errorFn) {
+        throw new Error('You called setTypeAndValidate without setting a '
+        + 'validationErrorMessageFn');
+      }
+      return validation(type, errorFn, name);
+    });
   }
 
   /**
@@ -388,7 +394,12 @@ export default class BaseBuilder {
       }
 
       if (this._state.get('_fieldBuilders').isEmpty()) {
-        return this._state.get('_type')(this._state.getIn(['options', 'error']));
+        const Type = this._state.get('_type');
+        const validationErrorMessageFn = this._state.getIn(['options', 'error']);
+        if (!Type) {
+          throw new Error('No type was set for the current builder');
+        }
+        return Type(validationErrorMessageFn);
       }
 
       // Recursively get the type of every sub-field and represent this at the top

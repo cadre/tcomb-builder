@@ -1,6 +1,7 @@
 import invariant from 'invariant';
 
 import SelectBuilder from '../primitives/SelectBuilder';
+import * as validators from '../validators';
 
 class RadioBuilder extends SelectBuilder.constructor {
   /**
@@ -16,4 +17,5 @@ class RadioBuilder extends SelectBuilder.constructor {
 }
 
 export default new RadioBuilder()
+  .setValidationErrorMessageFn(validators.shared.hasSelection)
   .setLazyTemplateFactory(provider => provider.getRadio());

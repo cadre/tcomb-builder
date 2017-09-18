@@ -337,6 +337,15 @@ describe('BaseBuilder', () => {
         expect(options.attrs.placeholder).to.equal(placeholder);
       });
     });
+
+    describe('setTypeAndValidate', () => {
+      it('requires an error message to be set before validation', () => {
+        const builder = new BaseBuilder()
+          .setTypeAndValidate(tcomb.Any, 'myType');
+
+        expect(() => builder.getType()).to.throw();
+      });
+    });
   });
 
   describe('getType()', () => {
@@ -346,6 +355,11 @@ describe('BaseBuilder', () => {
           const builder = new BaseBuilder().setType(() => 'foobar');
 
           expect(builder.getType()).to.equal('foobar');
+        });
+
+        it('throws when no type has been set', () => {
+          const builder = new BaseBuilder();
+          expect(() => builder.getType()).to.throw();
         });
       });
 
