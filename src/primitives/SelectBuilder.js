@@ -16,7 +16,7 @@ class SelectBuilder extends BaseBuilder {
       ? tcomb.enums.of(choices)
       : tcomb.enums(choices);
 
-    return this.setTypeAndValidate(typeEnum);
+    return this.setTypeAndValidate(typeEnum, 'Select');
   }
 }
 

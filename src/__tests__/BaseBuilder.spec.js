@@ -337,6 +337,13 @@ describe('BaseBuilder', () => {
         expect(options.attrs.placeholder).to.equal(placeholder);
       });
     });
+
+    describe('setTypeAndValidate', () => {
+      it('requires the type to have a name set', () => {
+        const builder = new BaseBuilder();
+        expect(() => builder.setTypeAndValidate(tcomb.Any)).to.throw();
+      });
+    });
   });
 
   describe('getType()', () => {
