@@ -1,6 +1,7 @@
 import UnionBuilder from '../UnionBuilder';
 import StructBuilder from '../StructBuilder';
 import TextBuilder from '../TextBuilder';
+import TemplatedTextBuilder from '../../widgets/TextBuilder';
 
 describe('UnionBuilder', () => {
   describe('setUnion and setDispatch', () => {
@@ -51,6 +52,23 @@ describe('UnionBuilder', () => {
         ));
       const Country = countriesBuilder.getType();
       expect(() => Country({ country: 'usa', state: 'california' })).to.throw();
+    });
+
+    it('can disable templates of union types', () => {
+      const international = StructBuilder
+        .setField('country', TemplatedTextBuilder);
+      const usa = StructBuilder
+        .setField('country', TemplatedTextBuilder)
+        .setField('state', TemplatedTextBuilder);
+
+      const countriesBuilder = UnionBuilder
+        ._disableTemplates()
+        .setUnion([international, usa])
+        .setDispatch(value => (
+          value.country === 'usa' ? usa : international
+        ));
+      expect(() => countriesBuilder.getOptions()).to.not.throw();
+      expect(countriesBuilder.getOptions()).to.have.length(2);
     });
   });
 

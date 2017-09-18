@@ -427,7 +427,7 @@ export default class BaseBuilder {
     const unionBuilders = this._state.get('_unionBuilders');
     if (!unionBuilders.isEmpty()) {
       return unionBuilders.reduce((acc, builder) =>
-        acc.push(builder.getOptions(provider)), Immutable.List()).toJS();
+        acc.push(builder.getOptions(provider, { disableTemplates })), Immutable.List()).toJS();
     }
 
     const hasConcreteTemplateFactory = this._state.hasIn(['options', 'factory']);
