@@ -257,9 +257,6 @@ export default class BaseBuilder {
    * @return {Builder}
    */
   setTypeAndValidate(type, name) {
-    if (!name) {
-      throw new Error(`No name provided to type '${type}'`);
-    }
     return this.setType(errorFn => {
       if (!errorFn) {
         throw new Error('validationErrorMessageFn was not supplied for the given type');

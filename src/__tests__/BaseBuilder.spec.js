@@ -339,9 +339,11 @@ describe('BaseBuilder', () => {
     });
 
     describe('setTypeAndValidate', () => {
-      it('requires the type to have a name set', () => {
-        const builder = new BaseBuilder();
-        expect(() => builder.setTypeAndValidate(tcomb.Any)).to.throw();
+      it('requires an error message to be set before validation', () => {
+        const builder = new BaseBuilder()
+          .setTypeAndValidate(tcomb.Any, 'myType');
+
+        expect(() => builder.getType()).to.throw();
       });
     });
   });
@@ -367,13 +369,6 @@ describe('BaseBuilder', () => {
           builder.getType();
 
           expect(calledError).to.be.true;
-        });
-
-        it('requires an error message to be set before validation', () => {
-          const builder = new BaseBuilder()
-            .setTypeAndValidate(tcomb.Any, 'myType');
-
-          expect(() => builder.getType()).to.throw();
         });
       });
     });
