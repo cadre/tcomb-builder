@@ -17,8 +17,6 @@ describe('LazyTemplateProvider', () => {
     expect(mockProvider.getCheckboxGroup()).to.equal('mock checkbox group');
     expect(mockProvider.getDropDown()).to.equal('mock dropdown');
     expect(mockProvider.getRadio()).to.equal('mock radio');
-    expect(mockProvider.getSingleColumn()).to.equal('mock single column');
-    expect(mockProvider.getDoubleColumn()).to.equal('mock double column');
     expect(mockProvider.getStaticPage()).to.equal('mock static page');
   });
 });

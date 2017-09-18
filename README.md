@@ -151,13 +151,12 @@ const foodGroup = widgets.CheckboxGroupBuilder
   .setLabel('Character Traits')
   .setField(noneKey, none);
 
-export default primitives.StructBuilder
+export default widgets.StructBuilder
   .setField('name', name)
   .setField('dateOfBirth', dateOfBirth)
   .setField('occupation', occupation)
   .setField('foodGroup', foodGroup)
-  .setLazyTemplateFactory(provider => provider.getDoubleColumn());
-```
+  .setColumns(2);
 
 Once exported, the page builder provides us with its tcomb type and options
 blob, which can be passed directly to
@@ -170,6 +169,6 @@ const options = InvestorInformationBuilder.getOptions();
 ```
 
 The end result, once tcomb template factories have been created for the
-underlying primitive types—text field, drop down, checkbox, and double column
-template primitives in this example—is that the form will render exactly as we
-expect it to.
+underlying primitive types—text field, drop down, checkbox, and struct
+template primitives in this example—is that the form will render exactly
+as we expect it to.

@@ -1,4 +1,5 @@
 import Immutable from 'immutable';
+import invariant from 'invariant';
 import tcomb from 'tcomb-validation';
 
 import { validation } from './combinators';
@@ -25,6 +26,8 @@ const initialState = {
 
   // Directly returned from the builder.
   options: Immutable.Map(),
+
+  _unionBuilders: Immutable.List(),
 };
 
 export default class BaseBuilder {
@@ -36,60 +39,60 @@ export default class BaseBuilder {
    * Set the disabled flag in the options object for this type.
    *
    * @param {boolean} disabled
-   * @return {BaseBuilder}
+   * @return {Builder}
    */
-  setDisabled(disabled) {
-    return new BaseBuilder(this._state.mergeDeep({ options: { disabled } }));
+  setDisabled(disabled = true) {
+    return new this.constructor(this._state.mergeDeep({ options: { disabled } }));
   }
 
   /**
    * Set the label in the options object for this type.
    *
    * @param {string} label
-   * @return {BaseBuilder}
+   * @return {Builder}
    */
   setLabel(label) {
-    return new BaseBuilder(this._state.mergeDeep({ options: { label } }));
+    return new this.constructor(this._state.mergeDeep({ options: { label } }));
   }
 
   /**
    * Set the name in the options object for this type.
    *
    * @param {string} name
-   * @return {BaseBuilder}
+   * @return {Builder}
    */
   setName(name) {
-    return new BaseBuilder(this._state.mergeDeep({ options: { name } }));
+    return new this.constructor(this._state.mergeDeep({ options: { name } }));
   }
 
   /**
    * Set the value in the options object for this type.
    *
    * @param {string} value
-   * @return {BaseBuilder}
+   * @return {Builder}
    */
   setValue(value) {
-    return new BaseBuilder(this._state.mergeDeep({ options: { value } }));
+    return new this.constructor(this._state.mergeDeep({ options: { value } }));
   }
 
   /**
    * Set the text in the options object for this type.
    *
    * @param {string} text
-   * @return {BaseBuilder}
+   * @return {Builder}
    */
   setText(text) {
-    return new BaseBuilder(this._state.mergeDeep({ options: { text } }));
+    return new this.constructor(this._state.mergeDeep({ options: { text } }));
   }
 
   /**
    * Set the help text in the options object for this type.
    *
    * @param {string} label
-   * @return {BaseBuilder}
+   * @return {Builder}
    */
   setHelp(help) {
-    return new BaseBuilder(this._state.mergeDeep({ options: { help } }));
+    return new this.constructor(this._state.mergeDeep({ options: { help } }));
   }
 
   /**
@@ -98,10 +101,10 @@ export default class BaseBuilder {
    * template factory using this method will supersede the lazy one.
    *
    * @param {factory} factory - A template provider class
-   * @return {BaseBuilder}
+   * @return {Builder}
    */
   setTemplateFactory(factory) {
-    return new BaseBuilder(this._state.mergeDeep({ options: { factory } }));
+    return new this.constructor(this._state.mergeDeep({ options: { factory } }));
   }
 
   /**
@@ -113,12 +116,10 @@ export default class BaseBuilder {
    *
    * @param {callback} callback - Function which takes a `LazyTemplateProvider`
    * instance and returns a template provider class
-   * @return {BaseBuilder}
+   * @return {Builder}
    */
   setLazyTemplateFactory(callback) {
-    return new BaseBuilder(
-      this._state.set('_templateProviderCallback', callback),
-    );
+    return new this.constructor(this._state.set('_templateProviderCallback', callback));
   }
 
   /**
@@ -126,20 +127,34 @@ export default class BaseBuilder {
    * Override any existing errors.
    *
    * @param {getValidationErrorMessage} error
-   * @return {BaseBuilder}
+   * @return {Builder}
    */
   setValidationErrorMessageFn(error) {
-    return new BaseBuilder(this._state.mergeDeep({ options: { error } }));
+    return new this.constructor(this._state.mergeDeep({ options: { error } }));
   }
 
   /**
    * Set the transformer function in the options object for this type.
    *
    * @param {transformer} transformer
-   * @return {BaseBuilder}
+   * @return {Builder}
    */
   setTransformer(transformer) {
-    return new BaseBuilder(this._state.mergeDeep({ options: { transformer } }));
+    return new this.constructor(this._state.mergeDeep({ options: { transformer } }));
+  }
+
+  /**
+   * Set the order in the options object for this type.
+   *
+   * @param {transformer} order
+   * @return {Builder}
+   */
+  setOrder(order) {
+    invariant(
+      ['asc', 'desc'].indexOf(order) !== -1,
+      'Order must be either \'asc\' or \'desc\'',
+    );
+    return new this.constructor(this._state.mergeDeep({ options: { order } }));
   }
 
   /**
@@ -148,7 +163,7 @@ export default class BaseBuilder {
    * equivalent to `setValidationErrorMessageFn`.
    *
    * @param {getValidationErrorMessage} error
-   * @return {BaseBuilder}
+   * @return {Builder}
    */
   addValidationErrorMessageFn(error) {
     const existingError = this._state.getIn(['options', 'error'], null);
@@ -156,7 +171,7 @@ export default class BaseBuilder {
       return this.setValidationErrorMessageFn(error);
     }
 
-    return new BaseBuilder(this._state.mergeDeep({
+    return new this.constructor(this._state.mergeDeep({
       options: { error: validators.combine([existingError, error]) },
     }));
   }
@@ -168,8 +183,8 @@ export default class BaseBuilder {
    * and options object.
    *
    * @param {string} key
-   * @param {BaseBuilder} fieldBuilder - a sub-field to set on this builder
-   * @return {BaseBuilder}
+   * @param {Builder} fieldBuilder - a sub-field to set on this builder
+   * @return {Builder}
    */
   setField(key, fieldBuilder) {
     if (this._state.getIn(['options', 'options'])) {
@@ -177,11 +192,9 @@ export default class BaseBuilder {
           + 'Select options and fields are mutually exclusive.');
     }
 
-    return new BaseBuilder(
-      this._state
-        .setIn(['_fieldBuilders', key], fieldBuilder)
-        .updateIn(['options', 'order'], Immutable.List(), arr => arr.push(key)),
-    );
+    return new this.constructor(this._state
+      .setIn(['_fieldBuilders', key], fieldBuilder)
+      .updateIn(['options', 'order'], Immutable.List(), arr => arr.push(key)));
   }
 
   /**
@@ -202,9 +215,9 @@ export default class BaseBuilder {
    *   ],
    * }
    *
-   * @param {BaseBuilder} selectBuilder - an options object to add to the
+   * @param {Builder} selectBuilder - an options object to add to the
    * select options fields
-   * @return {BaseBuilder}
+   * @return {Builder}
    */
   addSelectOption(selectBuilder) {
     if (!this._state.get('_fieldBuilders').isEmpty()) {
@@ -213,7 +226,7 @@ export default class BaseBuilder {
     }
 
     const selectOptions = Immutable.fromJS(selectBuilder.getOptions());
-    return new BaseBuilder(
+    return new this.constructor(
       this._state.updateIn(['options', 'options'],
         Immutable.List(),
         arr => arr.push(selectOptions)),
@@ -227,10 +240,10 @@ export default class BaseBuilder {
    *
    * @param {typeCombinatorCallback} typeCombinator - set a lazily executed
    * type on the internal state
-   * @return {BaseBuilder}
+   * @return {Builder}
    */
   setType(typeCombinator) {
-    return new BaseBuilder(this._state.set(
+    return new this.constructor(this._state.set(
       '_type',
       (error, subTypes) => typeCombinator(error, subTypes),
     ));
@@ -241,7 +254,7 @@ export default class BaseBuilder {
    * validation defined by the type.
    * @param {type}
    * type on the internal state
-   * @return {BaseBuilder}
+   * @return {Builder}
    */
   setTypeAndValidate(type, name) {
     return this.setType(errorFn => validation(type, errorFn, name));
@@ -253,51 +266,51 @@ export default class BaseBuilder {
    * sub-field options objects.
    *
    * @param {LazyTemplateProvider} provider
-   * @return {BaseBuilder}
+   * @return {Builder}
    */
   setLazyTemplateProvider(provider) {
-    return new BaseBuilder(this._state.set('_lazyTemplateProvider', provider));
+    return new this.constructor(this._state.set('_lazyTemplateProvider', provider));
   }
 
   /**
    * Set a field as optional. The type is wrapper in tcomb.maybe() when
    * `getType()` is called.
    *
-   * @return {BaseBuilder}
+   * @return {Builder}
    */
-  makeOptional() {
-    return new BaseBuilder(this._state.set('_isOptional', true));
+  makeOptional(isOptional = true) {
+    return new this.constructor(this._state.set('_isOptional', isOptional));
   }
 
   /**
    * Given a select builder that contains a value and some text (see the
    * addSelectOption method), set a default option in a dropdown field.
    *
-   * @param {BaseBuilder} selectBuilder
-   * @return {BaseBuilder}
+   * @param {Builder} selectBuilder
+   * @return {Builder}
    */
   setNullOption(selectBuilder) {
     const nullOption = selectBuilder.getOptions();
-    return new BaseBuilder(this._state.mergeDeep({ options: { nullOption } }));
+    return new this.constructor(this._state.mergeDeep({ options: { nullOption } }));
   }
 
   /**
    * Set a placeholder in the options blob for this field.
    *
-   * @return {BaseBuilder}
+   * @return {Builder}
    */
   setPlaceholder(placeholder) {
-    return new BaseBuilder(this._state.mergeDeep({ options: { attrs: { placeholder } } }));
+    return new this.constructor(this._state.mergeDeep({ options: { attrs: { placeholder } } }));
   }
 
 
   /**
    * Set whether or not this field should autofocus.
    *
-   * @return {BaseBuilder}
+   * @return {Builder}
    */
   setAutoFocus(autoFocus) {
-    return new BaseBuilder(this._state.mergeDeep({ options: { attrs: { autoFocus } } }));
+    return new this.constructor(this._state.mergeDeep({ options: { attrs: { autoFocus } } }));
   }
 
   /**
@@ -305,19 +318,41 @@ export default class BaseBuilder {
    * configure the template.
    *
    * @param {object}
-   * @return {BaseBuilder}
+   * @return {Builder}
    */
   setConfig(config) {
-    return new BaseBuilder(this._state.mergeDeep({ options: { config } }));
+    return new this.constructor(this._state.mergeDeep({ options: { config } }));
   }
 
   /**
    * For unit testing. Disable templates when calling the getOptions function.
    *
-   * @return {BaseBuilder}
+   * @return {Builder}
    */
   _disableTemplates() {
-    return new BaseBuilder(this._state.set('_disableTemplates', true));
+    return new this.constructor(this._state.set('_disableTemplates', true));
+  }
+
+  /**
+   * HELPER: Sets the theme in the config blob.
+   *
+   * @param {string} theme
+   * @return {Builder}
+   */
+  setTheme(theme) {
+    return this.setConfig({ theme });
+  }
+
+  /**
+   * Set the vertical rhythm in the config blob. The template should
+   * use this to configure how much vertical spacing should be between
+   * each individual component.
+   *
+   * @param {number} rhythm
+   * @return {Builder}
+   */
+  setVerticalRhythm(rhythm) {
+    return this.setConfig({ rhythm });
   }
 
   /**
@@ -329,6 +364,29 @@ export default class BaseBuilder {
    */
   getType() {
     const type = () => {
+      if (!this._state.get('_unionBuilders').isEmpty()) {
+        if (!this._state.has('_dispatch')) {
+          throw new Error('No dispatch function found for union type');
+        }
+
+        const unionBuilders = this._state.get('_unionBuilders');
+
+        const unionTypes = unionBuilders.map(builder => builder.getType());
+        const union = tcomb.union(unionTypes.toJS());
+
+        // When setting a dispatch function on the builder, return a builder.
+        // Here, take that builder and convert it into a type.
+        union.dispatch = value => {
+          const dispatchedBuilder = this._state.get('_dispatch')(value);
+          const typeIndex = unionBuilders.indexOf(dispatchedBuilder);
+          if (typeIndex === -1) {
+            throw new Error('Dispatched builder was not found within the union set');
+          }
+          return unionTypes.get(typeIndex);
+        };
+        return union;
+      }
+
       if (this._state.get('_fieldBuilders').isEmpty()) {
         return this._state.get('_type')(this._state.getIn(['options', 'error']));
       }
@@ -365,6 +423,12 @@ export default class BaseBuilder {
     } = config;
 
     const provider = lazyTemplateProvider || this._state.get('_lazyTemplateProvider');
+
+    const unionBuilders = this._state.get('_unionBuilders');
+    if (!unionBuilders.isEmpty()) {
+      return unionBuilders.reduce((acc, builder) =>
+        acc.push(builder.getOptions(provider)), Immutable.List()).toJS();
+    }
 
     const hasConcreteTemplateFactory = this._state.hasIn(['options', 'factory']);
 

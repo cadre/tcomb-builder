@@ -1,12 +1,10 @@
-import tcomb from 'tcomb-validation';
-
 import SelectBuilder from '../SelectBuilder';
 
 const testSelect = SelectBuilder
-  .setTypeAndValidate(tcomb.enums({ dog: 'Dog', cat: 'Cat' }));
+  .setChoices({ dog: 'Dog', cat: 'Cat' });
 
 const trueFalseSelect = SelectBuilder
-  .setTypeAndValidate(tcomb.enums.of([true, false]));
+  .setChoices([true, false]);
 
 describe('SelectBuilder', () => {
   it('should validate input properly', () => {
@@ -26,7 +24,7 @@ describe('SelectBuilder', () => {
   it('should return an error when selection is empty', () => {
     const options = testSelect.getOptions();
 
-    expect(options.error(null)).to.equal('Please select a value');
+    expect(options.error(null)).to.equal('Required');
   });
 
   // Test a regression where we were checking for !value in the RadioType

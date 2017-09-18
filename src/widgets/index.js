@@ -4,5 +4,6 @@ export DropDownBuilder from './DropDownBuilder';
 export NumberBuilder from './NumberBuilder';
 export RadioBuilder from './RadioBuilder';
 export StaticPageBuilder from './StaticPageBuilder';
+export StructBuilder from './StructBuilder';
 export TextAreaBuilder from './TextAreaBuilder';
 export TextBuilder from './TextBuilder';
