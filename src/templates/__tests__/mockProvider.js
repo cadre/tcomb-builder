@@ -1,12 +1,16 @@
-import { LazyTemplateProvider } from '../../index';
+import { LazyTemplateInterface, constructWithGetters } from '../../index';
+import MockTemplateFactory from './MockTemplateFactory';
 
-export default new LazyTemplateProvider()
-  .setCheckbox('mock checkbox')
-  .setCheckboxGroup('mock checkbox group')
-  .setDateTextField('mock date text field')
-  .setDropDown('mock dropdown')
-  .setFormPage('mock form page')
-  .setRadio('mock radio')
-  .setStaticPage('mock static page')
-  .setStruct('mock struct')
-  .setTextField('mock text field');
+
+export default constructWithGetters(LazyTemplateInterface, {
+  checkbox: new MockTemplateFactory('checkbox'),
+  checkboxGroup: new MockTemplateFactory('checkboxGroup'),
+  dateTextField: new MockTemplateFactory('dateTextField'),
+  dropDown: new MockTemplateFactory('dropDown'),
+  formPage: new MockTemplateFactory('formPage'),
+  radio: new MockTemplateFactory('radio'),
+  staticPage: new MockTemplateFactory('staticPage'),
+  struct: new MockTemplateFactory('struct'),
+  textArea: new MockTemplateFactory('textArea'),
+  textField: new MockTemplateFactory('textField'),
+});

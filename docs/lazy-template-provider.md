@@ -1,4 +1,4 @@
-# Lazy Template Provider
+# Lazy Template Interface
 
 ## Background
 
@@ -31,14 +31,14 @@ Consider two use cases:
 In the multipage survey case, your `tcomb-builder`s should be in a library that
 is shared between the client and server. In the library, use the
 `.setLazyTemplateFactory` function to lazily set the templates for your fields
-and layout. On the client, an instance of `LazyTemplateProvider` is created,
+and layout. On the client, an instance of `LazyTemplateInterface` is created,
 templates are set, and it is passed to the `.getOptions` method of the builders
 before they are passed to `tcomb-form`.
 
-**The `LazyTemplateProvider` is a key value mapping of identifiers to React
-components.** The class checks if the template has been set before returning it
-and throws a helpful error if it is missing rather than allow a confusing error
-to be thrown deep inside of `tcomb-form`.
+**The `LazyTemplateInterface` is a key value mapping of identifiers to React
+components.** The interface, a tcomb struct, ensures that all templates are
+provided before it can be used and throws a helpful error if one is missing
+rather than let a confusing error be thrown deep inside of `tcomb-form`.
 
 ### Single Form
 
@@ -48,11 +48,11 @@ only on the client. Builders for individual fields can still be shared; some
 are already available in this library.
 
 In this case, you can choose not to use `.setLazyTemplateFactory` and
-`LazyTemplateProvider`. Instead, use `.setTemplateFactory` since the template
+`LazyTemplateInterface`. Instead, use `.setTemplateFactory` since the template
 is available on the client (no need for lazy evaluation).
 
-Alternatively, you may find it is easier to configure one
-`LazyTemplateProvider` on the client that is the single source of truth for all
-of your templates and still use `.setLazyTemplateFactory` for your client
-forms. However, it is still recommended that you not place single page forms in
-a shared library because it makes your code harder to understand and reuse.
+Alternatively, you may find it is easier to create one instance of
+`LazyTemplateInterface` on the client that is the single source of truth for
+all your templates and still use `.setLazyTemplateFactory` for your client
+forms.  However, it is still recommended that you not place single page forms
+in a shared library because it makes your code harder to understand and reuse.

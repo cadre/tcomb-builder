@@ -85,7 +85,7 @@ usually shown under the field's label.
 Set a template provider class directly into the options object for this field.
 This is useful for a one-off use of tcomb builder. For example, if you wanted
 to use the drop down builder primitive directly, it would be inconvenient to
-need to set up an entire `LazyTemplateProvider` instance for only the drop down.
+need to set up an entire `LazyTemplateInterface` instance for only the drop down.
 Instead, you can set the `TemplateFactory` directly on the drop down builder.
 
 If a lazy template factory is already set on the builder, setting a concrete
@@ -113,7 +113,7 @@ factory by passing a callback function to the `setLazyTemplateFactory` method.
 
 ### Parameters
 
-**factory**: `LazyTemplateProvider => TemplateFactory`
+**factory**: `LazyTemplateInterface => TemplateFactory`
 
 ## `setValidationErrorMessageFn(error)`
 
@@ -265,7 +265,7 @@ sub-field options objects.
 
 ### Parameters
 
-**provider**: `LazyTemplateProvider`
+**provider**: `LazyTemplateInterface`
 
 ## `makeOptional(isOptional = true)`
 
@@ -381,11 +381,11 @@ last step, after all fields have already been set.
 
 ### Summary
 
-Get the tcomb options object from this builder. A `LazyTemplateProvider`
-instance must be provided to at least the top level `getOptions` call. That
-same instance will then be made available recursively to all inner builders
-when their `getOptions` methods are called.
+Get the tcomb options object from this builder. An instance of
+`LazyTemplateInterface` must be provided to at least the top level `getOptions`
+call. That same instance will then be made available recursively to all inner
+builders when their `getOptions` methods are called.
 
 ### Parameters
 
-**lazyTemplateProvider**: `?LazyTemplateProvider`
+**lazyTemplateProvider**: `?LazyTemplateInterface`

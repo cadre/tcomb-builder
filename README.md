@@ -103,10 +103,10 @@ There are three common use cases for Tcomb Form Builder:
 In the first and second cases, only `primitives` should be used and templates
 should be set directly on them.
 
-In the third case, a `LazyTemplateProvider` interface has been provided which
-holds a mapping of component types to templates. By using this interface, you
-can (for example) avoid setting the same template on every text field in a 20
-page survey. See the [API docs](./docs/api.md) for more details.
+In the third case, an instance of `LazyTemplateInterface`, which defines a
+mapping of component types to templates, should be used. By using this
+interface, you can (for example) avoid setting the same template on every text
+field in a 20 page survey. See the [API docs](./docs/api.md) for more details.
 
 ## Example
 
