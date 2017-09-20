@@ -1,14 +1,14 @@
 import tcomb from 'tcomb-validation';
 
 export default tcomb.struct({
-  checkbox: tcomb.Object,
-  checkboxGroup: tcomb.Object,
-  dateTextField: tcomb.Object,
-  dropDown: tcomb.Object,
-  formPage: tcomb.Object,
-  radio: tcomb.Object,
-  staticPage: tcomb.Object,
-  struct: tcomb.Object,
-  textArea: tcomb.Object,
-  textField: tcomb.Object,
+  checkbox: tcomb.Function,
+  checkboxGroup: tcomb.Function,
+  dateTextField: tcomb.Function,
+  dropDown: tcomb.Function,
+  formPage: tcomb.Function,
+  radio: tcomb.Function,
+  staticPage: tcomb.Function,
+  struct: tcomb.Function,
+  textArea: tcomb.Function,
+  textField: tcomb.Function,
 }, { name: 'LazyTemplateInterface', strict: true });

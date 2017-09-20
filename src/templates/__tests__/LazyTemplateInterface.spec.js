@@ -6,33 +6,33 @@ import mockProvider from './mockProvider';
 describe('LazyTemplateInterface', () => {
   it('throws when setting an undefined template', () => {
     expect(() => constructWithGetters(LazyTemplateInterface, {
-      checkbox: new MockTemplateFactory('checkbox'),
-      checkboxGroup: new MockTemplateFactory('checkboxGroup'),
-      dateTextField: new MockTemplateFactory('dateTextField'),
-      dropDown: new MockTemplateFactory('dropDown'),
-      formPage: new MockTemplateFactory('formPage'),
-      radio: new MockTemplateFactory('radio'),
-      staticPage: new MockTemplateFactory('staticPage'),
-      struct: new MockTemplateFactory('struct'),
-      textArea: new MockTemplateFactory('textArea'),
-      textField: new MockTemplateFactory('textField'),
+      checkbox: MockTemplateFactory,
+      checkboxGroup: MockTemplateFactory,
+      dateTextField: MockTemplateFactory,
+      dropDown: MockTemplateFactory,
+      formPage: MockTemplateFactory,
+      radio: MockTemplateFactory,
+      staticPage: MockTemplateFactory,
+      struct: MockTemplateFactory,
+      textArea: MockTemplateFactory,
+      textField: MockTemplateFactory,
 
-      extraField: new MockTemplateFactory('extraField'), // => extra
+      extraField: MockTemplateFactory, // => extra
     })).to.throw();
   });
 
   it('throws when a template is missing', () => {
     expect(() => constructWithGetters(LazyTemplateInterface, {
-      checkbox: new MockTemplateFactory('checkbox'),
-      checkboxGroup: new MockTemplateFactory('checkboxGroup'),
-      dateTextField: new MockTemplateFactory('dateTextField'),
-      dropDown: new MockTemplateFactory('dropDown'),
-      formPage: new MockTemplateFactory('formPage'),
-      radio: new MockTemplateFactory('radio'),
-      staticPage: new MockTemplateFactory('staticPage'),
-      struct: new MockTemplateFactory('struct'),
-      textArea: new MockTemplateFactory('textArea'),
-      // textField: new MockTemplateFactory('textField'), => missing
+      checkbox: MockTemplateFactory,
+      checkboxGroup: MockTemplateFactory,
+      dateTextField: MockTemplateFactory,
+      dropDown: MockTemplateFactory,
+      formPage: MockTemplateFactory,
+      radio: MockTemplateFactory,
+      staticPage: MockTemplateFactory,
+      struct: MockTemplateFactory,
+      textArea: MockTemplateFactory,
+      // textField: MockTemplateFactory, => missing
     })).to.throw();
   });
 
@@ -41,10 +41,7 @@ describe('LazyTemplateInterface', () => {
   });
 
   it('sets and gets templates', () => {
-    expect(mockProvider.getCheckbox().name).to.equal('checkbox');
-    expect(mockProvider.getCheckboxGroup().name).to.equal('checkboxGroup');
-    expect(mockProvider.getDropDown().name).to.equal('dropDown');
-    expect(mockProvider.getRadio().name).to.equal('radio');
-    expect(mockProvider.getStaticPage().name).to.equal('staticPage');
+    const Constructor = mockProvider.getCheckbox();
+    expect(new Constructor('checkbox').name).to.equal('checkbox');
   });
 });
