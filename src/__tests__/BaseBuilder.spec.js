@@ -79,7 +79,7 @@ describe('BaseBuilder', () => {
 
     describe('setSort()', () => {
       it('can set sort option in the config', () => {
-        const comparator = (a, b) => {
+        const sortComparator = (a, b) => {
           if (a.label < b.label) {
             return -1;
           } else if (a.label > b.label) {
@@ -87,9 +87,9 @@ describe('BaseBuilder', () => {
           }
           return 0;
         };
-        const builder = new BaseBuilder().setSort(comparator);
+        const builder = new BaseBuilder().setSort(sortComparator);
 
-        expect(builder.getOptions().config).to.deep.equal({ sort: comparator });
+        expect(builder.getOptions().config).to.deep.equal({ sortComparator });
       });
 
       it('throws error if order is not asc or desc', () => {

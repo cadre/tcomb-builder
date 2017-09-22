@@ -2,6 +2,7 @@ export * as primitives from './primitives';
 export * as validators from './validators';
 export * as widgets from './widgets';
 export BaseBuilder from './BaseBuilder';
+export comparators from './comparators';
 export LazyTemplateProvider from './templates/LazyTemplateProvider';
 
 /**
