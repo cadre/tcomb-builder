@@ -11,9 +11,9 @@ export function ascByLabel(a, b) {
 }
 
 export function ascByValue(a, b) {
-  if (a.label < b.label) {
+  if (a.value < b.value) {
     return -1;
-  } else if (a.label > b.label) {
+  } else if (a.value > b.value) {
     return 1;
   }
   return 0;
@@ -22,7 +22,7 @@ export function ascByValue(a, b) {
 export function descByLabel(a, b) {
   if (a.value < b.value) {
     return 1;
-  } else if (a.value > b.value) {
+  } else if (a.label > b.label) {
     return -1;
   }
   return 0;
