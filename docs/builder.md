@@ -351,16 +351,16 @@ for telling the template how much padding to put around the component.
 
 **rhythm**: `string`
 
-## `setOrder(order)`
+## `setSort(sortComparator)`
 
 ### Summary
 
-Set the order in the options object for this type. The order is either
-'asc' or 'desc'.
+Set the sort function in the config object for this type. This function will be
+used to tell the template how to sort the values in the enum.
 
 ### Parameters
 
-**order**: `string`
+**order**: `(a, b) => number`
 
 ## `_disableTemplates()`
 

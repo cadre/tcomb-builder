@@ -1,5 +1,4 @@
 import Immutable from 'immutable';
-import invariant from 'invariant';
 import tcomb from 'tcomb-validation';
 
 import { validation } from './combinators';
@@ -144,17 +143,13 @@ export default class BaseBuilder {
   }
 
   /**
-   * Set the order in the options object for this type.
+   * Set the sort comparator in the config object for this type.
    *
-   * @param {transformer} order
+   * @param {(Any, Any) => Integer} sortComparator
    * @return {Builder}
    */
-  setOrder(order) {
-    invariant(
-      ['asc', 'desc'].indexOf(order) !== -1,
-      'Order must be either \'asc\' or \'desc\'',
-    );
-    return new this.constructor(this._state.mergeDeep({ options: { order } }));
+  setSort(sortComparator) {
+    return this.setConfig({ sortComparator });
   }
 
   /**

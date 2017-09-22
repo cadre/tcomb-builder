@@ -34,18 +34,6 @@ describe('BaseBuilder', () => {
       });
     });
 
-    describe('setOrder()', () => {
-      it('can set order option on builder', () => {
-        const builder = new BaseBuilder().setOrder('asc');
-
-        expect(builder.getOptions()).to.deep.equal({ order: 'asc' });
-      });
-
-      it('throws error if order is not asc or desc', () => {
-        expect(() => new BaseBuilder().setOrder('foo')).to.throw();
-      });
-    });
-
     describe('setAutoFocus()', () => {
       it('can set an autofocus option', () => {
         const builder = new BaseBuilder().setAutoFocus(true);
@@ -88,6 +76,27 @@ describe('BaseBuilder', () => {
         expect(builder.getOptions().config).to.deep.equal({ theme: 'light' });
       });
     });
+
+    describe('setSort()', () => {
+      it('can set sort option in the config', () => {
+        const comparator = (a, b) => {
+          if (a.label < b.label) {
+            return -1;
+          } else if (a.label > b.label) {
+            return 1;
+          }
+          return 0;
+        };
+        const builder = new BaseBuilder().setSort(comparator);
+
+        expect(builder.getOptions().config).to.deep.equal({ sort: comparator });
+      });
+
+      it('throws error if order is not asc or desc', () => {
+        expect(() => new BaseBuilder().setOrder('foo')).to.throw();
+      });
+    });
+
 
     describe('setVerticalRhythm()', () => {
       it('can set rhythm option to the field\'s config option', () => {
