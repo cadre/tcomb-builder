@@ -91,12 +91,7 @@ describe('BaseBuilder', () => {
 
         expect(builder.getOptions().config).to.deep.equal({ sortComparator });
       });
-
-      it('throws error if order is not asc or desc', () => {
-        expect(() => new BaseBuilder().setOrder('foo')).to.throw();
-      });
     });
-
 
     describe('setVerticalRhythm()', () => {
       it('can set rhythm option to the field\'s config option', () => {
