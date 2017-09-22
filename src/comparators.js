@@ -20,7 +20,7 @@ export function ascByValue(a, b) {
 }
 
 export function descByLabel(a, b) {
-  if (a.value < b.value) {
+  if (a.label < b.label) {
     return 1;
   } else if (a.label > b.label) {
     return -1;
