@@ -128,7 +128,7 @@ export default class BaseBuilder {
    * @param {getValidationErrorMessage} error
    * @return {Builder}
    */
-  setValidationErrorMessageFn(error) {
+  setError(error) {
     return new this.constructor(this._state.mergeDeep({ options: { error } }));
   }
 
@@ -155,15 +155,15 @@ export default class BaseBuilder {
   /**
    * Add an error message function to the existing function in the options
    * object for this type. If there are no errors already set, then it is
-   * equivalent to `setValidationErrorMessageFn`.
+   * equivalent to `setError`.
    *
    * @param {getValidationErrorMessage} error
    * @return {Builder}
    */
-  addValidationErrorMessageFn(error) {
+  addError(error) {
     const existingError = this._state.getIn(['options', 'error'], null);
     if (!existingError) {
-      return this.setValidationErrorMessageFn(error);
+      return this.setError(error);
     }
 
     return new this.constructor(this._state.mergeDeep({
@@ -255,7 +255,7 @@ export default class BaseBuilder {
     return this.setType(errorFn => {
       if (!errorFn) {
         throw new Error('You called setTypeAndValidate without setting a '
-        + 'validationErrorMessageFn');
+        + 'validation function with setError');
       }
       return validation(type, errorFn, name);
     });

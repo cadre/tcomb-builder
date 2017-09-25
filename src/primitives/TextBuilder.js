@@ -10,4 +10,4 @@ const validation = validators.combine([
 
 export default new BaseBuilder()
   .setTypeAndValidate(tcomb.String, 'Text')
-  .setValidationErrorMessageFn(validation);
+  .setError(validation);

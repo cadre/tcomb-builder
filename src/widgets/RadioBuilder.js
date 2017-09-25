@@ -17,5 +17,5 @@ class RadioBuilder extends SelectBuilder.constructor {
 }
 
 export default new RadioBuilder()
-  .setValidationErrorMessageFn(validators.shared.hasSelection)
+  .setError(validators.shared.hasSelection)
   .setLazyTemplateFactory(provider => provider.getRadio());
