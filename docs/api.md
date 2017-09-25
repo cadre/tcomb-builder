@@ -8,9 +8,8 @@ Tcomb Builder exports the following:
 2. `primitives`
 3. `widgets`
 4. `validators`
-5. `create`
-6. `createTypes`
-7. `LazyTemplateProvider`
+5. `LazyTemplateInterface`
+6. `constructWithGetters`
 
 You can either import all of the above as one object
 
@@ -87,95 +86,39 @@ import { primitives, validators, widgets } from 'tcomb-builder';
    ]);
    ```
 
-### 5. `create`
+### 5. `LazyTemplateInterface`
 
-   `create : (forms: List<Object>, provider: LazyTemplateProvider) => Object`
-
-   A helper method for the survey case. Creates both the type and options
-   objects. Primarily used by front-end clients.
-
-   ```js
-   import { create } from 'tcomb-builder';
-   import CharacterProfileBuilder from '../examples/CharacterProfileBuilder';
-   import TelevisionShowBuilder from '../TelevisionShowBuilder';
-   import lazyTemplateProvider from './LazyTemplateProvider'
-
-   const constants = {
-     CHARACTER_PROFILE: 'CHARACTER_PROFILE',
-     TELEVISION_SHOW: 'TELEVISION_SHOW',
-   };
-
-   create([
-     {
-       builder: CharacterProfileBuilder,
-       name: constants.CHARACTER_PROFILE,
-     },
-     {
-       builder: TelevisionShowBuilder,
-       name: constants.TELEVISION_SHOW,
-     },
-   ], lazyTemplateProvider);
-
-   /**
-    * Exports an object of the form:
-    *
-    * {
-    *   CHARACTER_PROFILE: {
-    *     options: { // options blob // },
-    *     type: // tcomb type //,
-    *   },
-    *   TELEVISION_SHOW: {
-    *    options: { // options blob // },
-    *    type: // tcomb type //,
-    *   },
-    * }
-    */
-   ```
-
-### 6. `createTypes`
-
-   `createTypes : provider: LazyTemplateProvider => Object`
-
-   A helper method for the survey case. Create only the types object - not the
-   options object. Since the options object is not created, no templates are
-   realized.  Primarily used by back end clients.
+   The `LazyTemplateInterface` defines factories that will be lazily loaded by
+   tcomb-builder. When it is used, templates can be defined on builders before
+   they are available; for example, in a library that is shared between client
+   and server.
 
    ```js
-   import { createTypes } from 'tcomb-builder';
-   import CharacterProfileBuilder from '../examples/CharacterProfileBuilder';
-   import TelevisionShowBuilder from '../TelevisionShowBuilder';
+   import { LazyTemplateInterface } from 'tcomb-builder';
+   import CheckboxFactory from './path/to/CheckboxFactory';
+   // Import all other factories.
 
-   const constants = {
-     CHARACTER_PROFILE: 'CHARACTER_PROFILE',
-     TELEVISION_SHOW: 'TELEVISION_SHOW',
-   };
+   // Add custom template factories that are not defined in tcomb-builder.
+   const DefaultTemplateInterface = LazyTemplateInterface.extend({
+     myOtherWidget: tcomb.Object,
+   });
 
-   createTypes([
-     {
-       builder: CharacterProfileBuilder,
-       name: constants.CHARACTER_PROFILE,
-     },
-     {
-       builder: TelevisionShowBuilder,
-       name: constants.TELEVISION_SHOW,
-     },
-   ]);
-
-   /**
-    * Exports an object of the form:
-    *
-    * {
-    *   CHARACTER_PROFILE: // tcomb type //,
-    *   TELEVISION_SHOW: // tcomb type //,
-    * }
-    */
+   // Create an instance of the struct using the `constructWithGetters` helper
+   // method (more detail below).
+   export default constructWithGetters(DefaultTemplateInterface, {
+     checkbox: CheckboxFactory,
+     checkboxGroup: CheckboxGroupFactory,
+     // etc.
+   });
    ```
 
-### 7. `LazyTemplateProvider`
+### 6. `constructWithGetters`
 
-   ```js
-   import { LazyTemplateProvider } from 'tcomb-builder';
+   A helper method that adds getters for every prop on a tcomb.struct.  Its
+   intended use is for constructing an instance of `LazyTemplateInterface`,
+   where having methods instead of props can reveal errors earlier (because a
+   method is undefined). If props are used instead, an invalid/outdated prop
+   returns undefined and confusing errors are thrown inside the builder or,
+   worse, inside of tcomb-form.
 
-   const provider = new LazyTemplateProvider()
-       .setTextField(/* call these methods for every factory */);
-   ```
+   Example: See `LazyTemplateInterface` example above.

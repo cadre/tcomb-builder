@@ -108,13 +108,13 @@ export default class BaseBuilder {
 
   /**
    * Set the builder-specific `_templateProviderCallback` function which, when
-   * this builder is realized, will be used to set the `factory` field on
-   * the options object. By setting the template provider using a callback, a
-   * `LazyTemplateProvider` instance can be made available to all sub-fields
-   * recursively.
+   * this builder is realized, will be used to set the `factory` field on the
+   * options object. By setting the template provider using a callback, an
+   * instance of `LazyTemplateInterface` can be made available to all
+   * sub-fields recursively.
    *
-   * @param {callback} callback - Function which takes a `LazyTemplateProvider`
-   * instance and returns a template provider class
+   * @param {callback} callback - Function which takes an instance of
+   * `LazyTemplateInterface` and returns a template provider class
    * @return {Builder}
    */
   setLazyTemplateFactory(callback) {
@@ -266,7 +266,7 @@ export default class BaseBuilder {
    * type, and it will be used to recursively generate templates for all
    * sub-field options objects.
    *
-   * @param {LazyTemplateProvider} provider
+   * @param {LazyTemplateInterface} provider
    * @return {Builder}
    */
   setLazyTemplateProvider(provider) {

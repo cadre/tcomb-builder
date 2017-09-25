@@ -5,29 +5,29 @@ You may notice that some methods such as `setLabel`, `setError`, and
 these options are simple, their internal implementation is as basic as setting
 an option.
 
-On the other hand, methods like `setLazyTemplateFactory`, `setType`, and `setField`
-have APIs that aren't as simple as setting a field. This is due to two
-requirements: First, that the builder methods can be used in any order, and
-second, that the `LazyTemplateProvider` must be made available to every builder
-method.
+On the other hand, methods like `setLazyTemplateFactory`, `setType`, and
+`setField` have APIs that aren't as simple as setting a field. This is due to
+two requirements: First, that the builder methods can be used in any order, and
+second, that an instance of `LazyTemplateInterface` must be made available to
+every builder method.
 
 Let's look at the type signatures of these methods:
 
 ### `setLazyTemplateFactory` and `setLazyTemplateProvider`
 
 ```js
-setLazyTemplateFactory : (LazyTemplateProvider -> tcomb.form.Component) => BaseBuilder
+setLazyTemplateFactory : (LazyTemplateInterface -> tcomb.form.Component) => BaseBuilder
 builder.setLazyTemplateFactory(provider -> provider.getTextField())
 
-setLazyTemplateProvider : LazyTemplateProvider => BaseBuilder
+setLazyTemplateProvider : LazyTemplateInterface => BaseBuilder
 builder.setLazyTemplateProvider(provider)
 ```
 
 Here we can see that the `setLazyTemplateFactory` method takes a function which
 returns a `tcomb.form.Component`. This is useful because we can set the
-`LazyTemplateProvider` instance on the very top-level builder that we export in
-`index.js` and make that `TemplateFactory` instance available to every
-sub-field of that builder.
+instance of `LazyTemplateInterface` on the very top-level builder that we
+export in `index.js` and make that `TemplateFactory` instance available to
+every sub-field of that builder.
 
 As a concrete example, we can call `setLazyTemplateProvider` on only the
 `WiringInstructions` builder, and that same provider will recursively be made
