@@ -126,10 +126,10 @@ describe('BaseBuilder', () => {
       });
     });
 
-    describe('setValidationErrorMessageFn()', () => {
+    describe('setError()', () => {
       it('can set an error option function', () => {
         const fn = () => { ({ foo: 'bar' }); };
-        const builder = new BaseBuilder().setValidationErrorMessageFn(fn);
+        const builder = new BaseBuilder().setError(fn);
 
         expect(builder.getOptions()).to.deep.equal({ error: fn });
       });
@@ -144,11 +144,11 @@ describe('BaseBuilder', () => {
       });
     });
 
-    describe('addValidationErrorMessageFn()', () => {
+    describe('addError()', () => {
       context('no existing error message function exists', () => {
         it('sets it as the inital error function', () => {
           const fn = items => (items.length > 1 ? null : 'Too short');
-          const builder = new BaseBuilder().addValidationErrorMessageFn(fn);
+          const builder = new BaseBuilder().addError(fn);
           expect(builder.getOptions().error(['a'])).to.equal('Too short');
         });
       });
@@ -158,11 +158,11 @@ describe('BaseBuilder', () => {
           const fn1 = items => (items.length > 1 ? null : 'Too short');
           const fn2 = items => (items[0] === 'foo' ? null : 'Wrong first element');
 
-          const builder = new BaseBuilder().setValidationErrorMessageFn(fn1);
+          const builder = new BaseBuilder().setError(fn1);
 
           expect(builder.getOptions().error(['a', 'b'])).to.equal(null);
 
-          const combinedBuilder = builder.addValidationErrorMessageFn(fn2);
+          const combinedBuilder = builder.addError(fn2);
 
           expect(combinedBuilder.getOptions().error(['a', 'b'])).to.contain('first');
           expect(combinedBuilder.getOptions().error(['foo', 'b'])).to.equal(null);
@@ -185,7 +185,7 @@ describe('BaseBuilder', () => {
         const fn = () => { ({ foo: 'bar' }); };
         const field = new BaseBuilder()
           .setDisabled(true)
-          .setValidationErrorMessageFn(fn)
+          .setError(fn)
           .setLabel('foobar');
         const builder = new BaseBuilder()
           .setDisabled(true)
@@ -372,7 +372,7 @@ describe('BaseBuilder', () => {
           let calledError = false;
           const errorFn = () => { calledError = true; };
           const builder = new BaseBuilder()
-            .setValidationErrorMessageFn(errorFn)
+            .setError(errorFn)
             .setType(error => error());
 
           builder.getType();

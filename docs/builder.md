@@ -115,14 +115,13 @@ factory by passing a callback function to the `setLazyTemplateFactory` method.
 
 **factory**: `LazyTemplateInterface => TemplateFactory`
 
-## `setValidationErrorMessageFn(error)`
+## `setError(error)`
 
 ### Summary
 
 Set an error message function for this field in its options object. The error
 message function must conform to the same spec as that in `tcomb-validation`.
-It simply returns `null` if there is no error, and a `string` if an error
-occurred.
+It returns `null` if there is no error, and a `string` if an error occurred.
 
 ### Example
 
@@ -132,20 +131,20 @@ function getValidationErrorMessage(value) {
 }
 
 const field = new BaseBuilder()
-    .setValidationErrorMessageFn(getValidationErrorMessage);
+    .setError(getValidationErrorMessage);
 ```
 
 ### Parameters
 
 **error**: `(value, path, context) => ?(string | ReactElement)`
 
-## `addValidationErrorMessageFn(error)`
+## `addError(error)`
 
 ### Summary
 
 Adds an error message function to the existing function in the options object
 for this type. If there are no errors already set, then it is equivalent to
-`setValidationErrorMessageFn`.
+`setError`.
 
 ### Example
 
@@ -159,8 +158,8 @@ function truthyValidation(value) {
 }
 
 const field = new BaseBuilder()
-    .setValidationErrorMessageFn(booleanValidation)
-    .addValidationErrorMessageFn(truthyValidation);
+    .setError(booleanValidation)
+    .addError(truthyValidation);
 ```
 
 ### Parameters
