@@ -517,5 +517,23 @@ describe('BaseBuilder', () => {
 
       expect(builder1.isEqual(builder2)).to.be.false;
     });
+
+    it('can compare inequivalent builders', () => {
+      const builder1 = new BaseBuilder().setLabel('Foo');
+      const builder2 = new BaseBuilder().setLabel('Bar');
+
+      expect(builder1.isEqual(builder2)).to.be.false;
+    });
+
+    it('can compare inequivalent builders', () => {
+      const error = () => 'Error';
+      const error2 = () => null;
+      const builder1 = new BaseBuilder()
+        .setValidationErrorMessageFn(error);
+      const builder2 = new BaseBuilder()
+        .setValidationErrorMessageFn(error2);
+
+      expect(builder1.isEqual(builder2)).to.be.false;
+    });
   });
 });
