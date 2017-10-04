@@ -77,6 +77,24 @@ describe('BaseBuilder', () => {
       });
     });
 
+    describe('setErrorMessageTemplate()', () => {
+      it('can set setErrorMessageTemplate options to the field\'s config option', () => {
+        const errorTemplateCallback = error => `ERROR: ${error}`;
+        const builder = new BaseBuilder().setErrorMessageTemplate(errorTemplateCallback);
+
+        expect(builder.getOptions().config).to.deep.equal({ errorTemplateCallback });
+      });
+    });
+
+    describe('setLabelTemplate()', () => {
+      it('can set labelTemplateCallback options to the field\'s config option', () => {
+        const labelTemplateCallback = error => `Label: ${error}`;
+        const builder = new BaseBuilder().setLabelTemplate(labelTemplateCallback);
+
+        expect(builder.getOptions().config).to.deep.equal({ labelTemplateCallback });
+      });
+    });
+
     describe('setSort()', () => {
       it('can set sort option in the config', () => {
         const sortComparator = (a, b) => {
