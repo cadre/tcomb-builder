@@ -426,6 +426,10 @@ export default class BaseBuilder {
       return false;
     }
 
+    if (otherBuilder === this) {
+      return true;
+    }
+
     const equalFields = this._state.get('_fieldBuilders').entrySeq().every(entry => {
       const key = entry[0];
       const field = entry[1];
