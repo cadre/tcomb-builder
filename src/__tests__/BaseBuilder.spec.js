@@ -102,6 +102,15 @@ describe('BaseBuilder', () => {
       });
     });
 
+    describe('setError()', () => {
+      it('can set error option to the field\'s config option', () => {
+        const error = 'There was a problem with that field';
+        const builder = new BaseBuilder().setError(error);
+
+        expect(builder.getOptions().config).to.deep.equal({ error });
+      });
+    });
+
     describe('setValue()', () => {
       it('can set a label option field', () => {
         const builder = new BaseBuilder().setValue('foobar');
