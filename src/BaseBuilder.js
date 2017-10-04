@@ -4,6 +4,11 @@ import tcomb from 'tcomb-validation';
 import { validation } from './combinators';
 import * as validators from './validators';
 
+function keyIn(...keys) {
+  const keySet = Immutable.Set(keys);
+  return (v, k) => keySet.has(k);
+}
+
 const initialState = {
   // Used to internally set fields which will later be realized into type and
   // options objects.
@@ -404,6 +409,36 @@ export default class BaseBuilder {
    */
   setVerticalRhythm(rhythm) {
     return this.setConfig({ rhythm });
+  }
+
+  getComparables() {
+    return this._state.filterNot(keyIn(
+      '_dispatch',
+      '_fieldBuilders',
+      '_lazyTemplateProvider',
+      '_templateProviderCallback',
+      '_unionBuilders',
+    ));
+  }
+
+  isEqual(otherBuilder) {
+    if (!otherBuilder) {
+      return false;
+    }
+
+    const equalFields = this._state.get('_fieldBuilders').entrySeq().every(entry => {
+      const key = entry[0];
+      const field = entry[1];
+
+      return field.isEqual(otherBuilder._state.getIn(['_fieldBuilders', key]));
+    });
+
+    const equalUnions = this._state.get('_unionBuilders').every((field, i) =>
+      field.isEqual(otherBuilder._state.getIn(['_unionBuilders', i])));
+
+    return equalFields &&
+      equalUnions &&
+      otherBuilder.getComparables().equals(this.getComparables());
   }
 
   /**
