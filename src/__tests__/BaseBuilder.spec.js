@@ -482,4 +482,58 @@ describe('BaseBuilder', () => {
       });
     });
   });
+
+  describe('isEqual()', () => {
+    it('returns true with passed the same instance', () => {
+      const builder = new BaseBuilder();
+      expect(builder.isEqual(builder)).to.be.true;
+    });
+
+    it('can compare equivalent builders', () => {
+      const builder = new BaseBuilder();
+      expect(builder.isEqual(builder)).to.be.true;
+    });
+
+    it('can compare equivalent builders', () => {
+      const builder1 = new BaseBuilder()
+        .setField('subfield1', new BaseBuilder())
+        .setField('subfield2', new BaseBuilder());
+      const builder2 = new BaseBuilder()
+        .setField('subfield1', new BaseBuilder())
+        .setField('subfield2', new BaseBuilder());
+
+      expect(builder1.isEqual(builder2)).to.be.true;
+    });
+
+    it('can compare inequivalent builders', () => {
+      const builder1 = new BaseBuilder()
+        .setField('subfield1', new BaseBuilder()
+          .setConfig({ foo: 'bar' }))
+        .setField('subfield2', new BaseBuilder());
+      const builder2 = new BaseBuilder()
+        .setField('subfield1', new BaseBuilder()
+          .setConfig({ foo: 'baz' }))
+        .setField('subfield2', new BaseBuilder());
+
+      expect(builder1.isEqual(builder2)).to.be.false;
+    });
+
+    it('can compare inequivalent builders', () => {
+      const builder1 = new BaseBuilder().setLabel('Foo');
+      const builder2 = new BaseBuilder().setLabel('Bar');
+
+      expect(builder1.isEqual(builder2)).to.be.false;
+    });
+
+    it('can compare inequivalent builders', () => {
+      const error = () => 'Error';
+      const error2 = () => null;
+      const builder1 = new BaseBuilder()
+        .setValidationErrorMessageFn(error);
+      const builder2 = new BaseBuilder()
+        .setValidationErrorMessageFn(error2);
+
+      expect(builder1.isEqual(builder2)).to.be.false;
+    });
+  });
 });
