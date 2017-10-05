@@ -65,6 +65,20 @@ export default class BaseBuilder {
   }
 
   /**
+   * Set what property should be automatically created.
+   *
+   * Supported Options:
+   * - placeholders
+   * - labels
+   *
+   * @param {string} auto
+   * @return {Builder}
+   */
+  setAuto(auto) {
+    return new this.constructor(this._state.mergeDeep({ options: { auto } }));
+  }
+
+  /**
    * Set the value in the options object for this type.
    *
    * @param {string} value
