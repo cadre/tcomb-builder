@@ -68,8 +68,9 @@ export default class BaseBuilder {
    * Set what property should be automatically created.
    *
    * Supported Options:
-   * - placeholders
    * - labels
+   * - placeholders
+   * - none
    *
    * @param {string} auto
    * @return {Builder}
