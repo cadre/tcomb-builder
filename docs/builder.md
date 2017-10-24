@@ -372,7 +372,7 @@ an API returns an error message that pertains to a particular field or struct.
 
 ### Parameters
 
-**order**: `(a, b) => number`
+**error**: `string`
 
 ## `_disableTemplates()`
 
