@@ -357,6 +357,19 @@ export default class BaseBuilder {
   }
 
   /**
+   * Set the error message directly onto the builder. This is useful
+   * for manually setting errors that originate externally from the
+   * form itself. For example, if an API returns an error message
+   * that pertains to a particular field or struct.
+   *
+   * @param {string} error
+   * @return {Builder}
+   */
+  setError(error) {
+    return this.setConfig({ error });
+  }
+
+  /**
    * Return a realized type. Lazily realize the type so that the most recent
    * versions of the `error` function and `_fieldBuilders` object are
    * available.

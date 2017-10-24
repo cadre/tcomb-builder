@@ -362,6 +362,18 @@ used to tell the template how to sort the values in the enum.
 
 **order**: `(a, b) => number`
 
+## `setError(error)`
+
+### Summary
+
+Set the error message directly onto the builder. This is useful for manually
+setting errors that originate externally from the form itself. For example, if
+an API returns an error message that pertains to a particular field or struct.
+
+### Parameters
+
+**order**: `(a, b) => number`
+
 ## `_disableTemplates()`
 
 ### Summary
