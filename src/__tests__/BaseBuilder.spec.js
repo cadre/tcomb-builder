@@ -34,6 +34,14 @@ describe('BaseBuilder', () => {
       });
     });
 
+    describe('setAuto()', () => {
+      it('can set the auto option field', () => {
+        const builder = new BaseBuilder().setAuto('placeholders');
+
+        expect(builder.getOptions()).to.deep.equal({ auto: 'placeholders' });
+      });
+    });
+
     describe('setAutoFocus()', () => {
       it('can set an autofocus option', () => {
         const builder = new BaseBuilder().setAutoFocus(true);

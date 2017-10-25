@@ -54,6 +54,17 @@ display value in select and radio groups.
 
 **text**: `string`
 
+## `setAuto(text)`
+
+### Summary
+
+Set what properties should be automatically generated for you.
+Options are: 'labels', 'placeholders', 'none'.
+
+### Parameters
+
+**text**: `string`
+
 ## `setTransformer(transformer)`
 
 ### Summary
