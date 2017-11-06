@@ -126,6 +126,21 @@ factory by passing a callback function to the `setLazyTemplateFactory` method.
 
 **factory**: `LazyTemplateInterface => TemplateFactory`
 
+## `setErrorMessageTemplate(callback)`
+
+### Summary
+
+Set a template callback that is used by the field's template to render the
+error message.
+
+### Example
+
+`.setErrorMessageTemplate(error => <span>{error}</span>)`
+
+### Parameters
+
+**callback**: `string => ReactElement|HTMLElement`
+
 ## `setValidationErrorMessageFn(error)`
 
 ### Summary

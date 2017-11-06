@@ -137,6 +137,28 @@ export default class BaseBuilder {
   }
 
   /**
+   * Set the `errorTemplateCallback` function which will be used to
+   * render the error message for the field.
+   *
+   * @param {String => ReactNode} errorTemplateCallback
+   * @return {Builder}
+   */
+  setErrorMessageTemplate(errorTemplateCallback) {
+    return this.setConfig({ errorTemplateCallback });
+  }
+
+  /**
+   * Set the `labelTemplateCallback` function which will be used to
+   * render the label for the field.
+   *
+   * @param {String => ReactNode} labelTemplateCallback
+   * @return {Builder}
+   */
+  setLabelTemplate(labelTemplateCallback) {
+    return this.setConfig({ labelTemplateCallback });
+  }
+
+  /**
    * Set the error message function in the options object for this type.
    * Override any existing errors.
    *
