@@ -7,8 +7,10 @@ describe('UnionBuilder', () => {
   describe('setUnion and setDispatch', () => {
     it('should create a valid union type', () => {
       const international = StructBuilder
+        .setValidation(() => null)
         .setField('country', TextBuilder);
       const usa = StructBuilder
+        .setValidation(() => null)
         .setField('country', TextBuilder)
         .setField('state', TextBuilder);
       const countriesBuilder = UnionBuilder

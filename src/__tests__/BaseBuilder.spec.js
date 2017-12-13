@@ -134,12 +134,24 @@ describe('BaseBuilder', () => {
       });
     });
 
-    describe('setValidationErrorMessageFn()', () => {
-      it('can set an error option function', () => {
-        const fn = () => { ({ foo: 'bar' }); };
-        const builder = new BaseBuilder().setValidationErrorMessageFn(fn);
+    describe('setError()', () => {
+      it('sets an error key in the options object', () => {
+        const error = 'errorStr';
+        const builder = new BaseBuilder()
+          .setError(error);
 
-        expect(builder.getOptions()).to.deep.equal({ error: fn });
+        expect(builder.getOptions().error).to.equal(error);
+      });
+    });
+
+    describe('setValidation()', () => {
+      it('can set a validation function', () => {
+        const fn = () => { ({ foo: 'bar' }); };
+        const builder = new BaseBuilder()
+          .setType(() => tcomb.String)
+          .setValidation(fn);
+
+        expect(builder.getType().getValidationErrorMessage).to.equal(fn);
       });
     });
 
@@ -152,28 +164,33 @@ describe('BaseBuilder', () => {
       });
     });
 
-    describe('addValidationErrorMessageFn()', () => {
-      context('no existing error message function exists', () => {
-        it('sets it as the inital error function', () => {
+    describe('addValidation()', () => {
+      context('no existing validation function exists', () => {
+        it('sets the validation function', () => {
           const fn = items => (items.length > 1 ? null : 'Too short');
-          const builder = new BaseBuilder().addValidationErrorMessageFn(fn);
-          expect(builder.getOptions().error(['a'])).to.equal('Too short');
+          const builder = new BaseBuilder()
+            .setType(() => tcomb.String)
+            .addValidation(fn);
+          expect(builder.getType().getValidationErrorMessage(['a'])).to.equal('Too short');
         });
       });
 
-      context('an existing error message function exists', () => {
-        it('combines the new error function', () => {
+      context('an existing validation function exists', () => {
+        it('combines the existing and new validation functions', () => {
           const fn1 = items => (items.length > 1 ? null : 'Too short');
           const fn2 = items => (items[0] === 'foo' ? null : 'Wrong first element');
 
-          const builder = new BaseBuilder().setValidationErrorMessageFn(fn1);
+          const builder = new BaseBuilder()
+            .setType(() => tcomb.String)
+            .setValidation(fn1);
 
-          expect(builder.getOptions().error(['a', 'b'])).to.equal(null);
+          expect(builder.getType().getValidationErrorMessage(['a', 'b'])).to.equal(null);
 
-          const combinedBuilder = builder.addValidationErrorMessageFn(fn2);
+          const combinedBuilder = builder.addValidation(fn2);
 
-          expect(combinedBuilder.getOptions().error(['a', 'b'])).to.contain('first');
-          expect(combinedBuilder.getOptions().error(['foo', 'b'])).to.equal(null);
+          const combinedType = combinedBuilder.getType();
+          expect(combinedType.getValidationErrorMessage(['a', 'b'])).to.contain('first');
+          expect(combinedType.getValidationErrorMessage(['foo', 'b'])).to.equal(null);
         });
       });
     });
@@ -190,10 +207,10 @@ describe('BaseBuilder', () => {
       });
 
       it('can set static options fields', () => {
-        const fn = () => { ({ foo: 'bar' }); };
+        const fn = 'errorStr';
         const field = new BaseBuilder()
           .setDisabled(true)
-          .setValidationErrorMessageFn(fn)
+          .setError(fn)
           .setLabel('foobar');
         const builder = new BaseBuilder()
           .setDisabled(true)
@@ -201,7 +218,7 @@ describe('BaseBuilder', () => {
 
         expect(builder.getOptions()).to.deep.equal({
           disabled: true,
-          fields: { customField: { disabled: true, error: fn, label: 'foobar' } },
+          fields: { customField: { disabled: true, error: 'errorStr', label: 'foobar' } },
           order: ['customField'],
         });
       });
@@ -364,9 +381,9 @@ describe('BaseBuilder', () => {
     context('no sub-fields have been set', () => {
       context('no error message has been set', () => {
         it('returns the type of the current builder', () => {
-          const builder = new BaseBuilder().setType(() => 'foobar');
+          const builder = new BaseBuilder().setType(() => tcomb.String);
 
-          expect(builder.getType()).to.equal('foobar');
+          expect(builder.getType()).to.equal(tcomb.String);
         });
 
         it('throws when no type has been set', () => {
@@ -374,49 +391,45 @@ describe('BaseBuilder', () => {
           expect(() => builder.getType()).to.throw();
         });
       });
-
-      context('an error message has been set', () => {
-        it('returns the type of the current builder', () => {
-          let calledError = false;
-          const errorFn = () => { calledError = true; };
-          const builder = new BaseBuilder()
-            .setValidationErrorMessageFn(errorFn)
-            .setType(error => error());
-
-          builder.getType();
-
-          expect(calledError).to.be.true;
-        });
-      });
     });
 
     context('sub-fields have been set', () => {
       context('no builder types are dependent on the fieldset', () => {
         it('returns the type of only the top level builder', () => {
-          const field1 = new BaseBuilder().setType(() => 'field1');
-          const field2 = new BaseBuilder().setType(() => 'field2');
+          const field1 = new BaseBuilder().setType(() => tcomb.String);
+          const field2 = new BaseBuilder().setType(() => tcomb.String);
 
           const builder = new BaseBuilder()
-            .setType(() => 'builder')
+            .setType(() => tcomb.String)
             .setField('field1', field1)
             .setField('field2', field2);
 
-          expect(builder.getType()).to.equal('builder');
+          expect(builder.getType()).to.equal(tcomb.String);
         });
       });
 
       context('builder types are dependent on the fieldset', () => {
         it('returns the type of the builder with the context of the sub-fields', () => {
-          const field1 = new BaseBuilder().setType(() => 'field1');
-          const field2 = new BaseBuilder().setType(() => 'field2');
+          const validation1 = () => 'foo';
+          const field1 = new BaseBuilder()
+            .setValidation(validation1)
+            .setType(() => tcomb.String);
 
+          const validation2 = () => 'bar';
+          const field2 = new BaseBuilder()
+            .setValidation(validation2)
+            .setType(() => tcomb.Number);
+
+          const builderValidation = () => 'builder';
           const builder = new BaseBuilder()
             .setType((error, fields) => ({ foo: fields }))
+            .setValidation(builderValidation)
             .setField('field1', field1)
             .setField('field2', field2);
 
           expect(builder.getType()).to.deep.equal({
-            foo: { field1: 'field1', field2: 'field2' },
+            foo: { field1: tcomb.String, field2: tcomb.Number },
+            getValidationErrorMessage: builderValidation,
           });
         });
       });

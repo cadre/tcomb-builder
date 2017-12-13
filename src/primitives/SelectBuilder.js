@@ -21,4 +21,4 @@ class SelectBuilder extends BaseBuilder {
 }
 
 export default new SelectBuilder()
-  .setValidationErrorMessageFn(validators.shared.hasSelection);
+  .setValidation(validators.shared.hasSelection);

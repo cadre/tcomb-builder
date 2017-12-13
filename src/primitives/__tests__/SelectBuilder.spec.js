@@ -8,23 +8,23 @@ const trueFalseSelect = SelectBuilder
 
 describe('SelectBuilder', () => {
   it('should validate input properly', () => {
-    const builder = testSelect.getType();
+    const SelectType = testSelect.getType();
     const selection = 'dog';
 
-    expect(builder(selection)).to.equal('dog');
+    expect(SelectType(selection)).to.equal('dog');
   });
 
   it('should produce an error message for invalid input', () => {
-    const builder = testSelect.getType();
+    const SelectType = testSelect.getType();
     const selection = 'bird';
 
-    expect(() => builder(selection)).to.throw();
+    expect(() => SelectType(selection)).to.throw();
   });
 
   it('should return an error when selection is empty', () => {
-    const options = testSelect.getOptions();
+    const SelectType = testSelect.getType();
 
-    expect(options.error(null)).to.equal('Required');
+    expect(SelectType.getValidationErrorMessage(null)).to.equal('Required');
   });
 
   // Test a regression where we were checking for !value in the RadioType

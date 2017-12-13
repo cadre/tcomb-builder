@@ -9,4 +9,4 @@ const validation = validators.combine([
 
 export default new BaseBuilder()
   .setTypeAndValidate(tcomb.Number, 'Number')
-  .setValidationErrorMessageFn(validation);
+  .setValidation(validation);
