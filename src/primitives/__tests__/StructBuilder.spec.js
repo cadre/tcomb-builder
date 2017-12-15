@@ -2,7 +2,6 @@ import TextBuilder from '../TextBuilder';
 import StructBuilder from '../StructBuilder';
 
 const exampleStruct = StructBuilder
-  .setValidation(() => null)
   .setField('first', TextBuilder.setLabel('first'))
   .setField('second', TextBuilder.setLabel('second'));
 
