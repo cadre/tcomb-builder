@@ -134,11 +134,18 @@ describe('BaseBuilder', () => {
       });
     });
 
+    describe('setHasError()', () => {
+      it('sets the hasError boolean in the options object', () => {
+        const builder = new BaseBuilder().setHasError(true);
+
+        expect(builder.getOptions().hasError).to.equal(true);
+      });
+    });
+
     describe('setError()', () => {
       it('sets an error key in the options object', () => {
         const error = 'errorStr';
-        const builder = new BaseBuilder()
-          .setError(error);
+        const builder = new BaseBuilder().setError(error);
 
         expect(builder.getOptions().error).to.equal(error);
       });

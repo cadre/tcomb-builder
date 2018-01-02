@@ -152,6 +152,18 @@ export default class BaseBuilder {
   }
 
   /**
+   * Set the hasError key in the options object. Used to force tcomb to display
+   * an error. Setting hasError to true won't stop the form from being
+   * submitted; in fact, it will get overwritten by tcomb-form on submit.
+   *
+   * @param {boolean} hasError
+   * @return {BaseBuilder}
+   */
+  setHasError(hasError) {
+    return new this.constructor(this._state.mergeDeep({ options: { hasError } }));
+  }
+
+  /**
    * Set a validation function that will be set on the tcomb type when it is
    * realized. This method will override previously set functions.
    *

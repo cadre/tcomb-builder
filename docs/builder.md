@@ -145,6 +145,26 @@ const field = new BaseBuilder()
 
 **error**: `string`
 
+## `setHasError(hasError)`
+
+### Summary
+
+Set the hasError key in the options object. Used in conjuction with setError to
+force tcomb to display an error. Setting hasError to true won't stop the form
+from being submitted; in fact, it will get overwritten by tcomb-form on submit.
+
+### Example
+
+```js
+const field = new BaseBuilder()
+    .setError('There was an API error.')
+    .setHasError(apiError || false);
+```
+
+### Parameters
+
+**hasError**: `boolean`
+
 ## `setValidation(getValidationErrorMessage)`
 
 ### Summary
