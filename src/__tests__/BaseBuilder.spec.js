@@ -156,7 +156,7 @@ describe('BaseBuilder', () => {
         expect(builder.getOptions().hasError).to.be.true;
       });
 
-      it('can set override setting hasError by default', () => {
+      it('overrides hasError setting by default', () => {
         const builder = new BaseBuilder().setError('errorStr', { overrideHasError: true });
 
         expect(builder.getOptions().hasError).to.be.undefined;
