@@ -134,7 +134,7 @@ Set the error key in the options object. Since the function set by
 `setValidation` runs client-side validation on the form, `setError` is best
 used to set errors returned by the API directly onto the form. By default,
 `.setError` also sets hasError to true if `error` is truthy and false
-otherwise. You can disable this behavior by passing in the `autoHasError`
+otherwise. You can disable this behavior by passing in the `overrideHasError`
 option in the config object.
 
 ### Example
@@ -146,7 +146,7 @@ const field = new BaseBuilder()
 // or
 
 const field = new BaseBuilder()
-    .setError('There was an error.', { autoHasError: false })
+    .setError('There was an error.', { overrideHasError: true })
     .setHasError(someOtherBooleanTest);
 ```
 

@@ -156,8 +156,8 @@ describe('BaseBuilder', () => {
         expect(builder.getOptions().hasError).to.be.true;
       });
 
-      it('can set hasError to false in the options object', () => {
-        const builder = new BaseBuilder().setError('errorStr', { autoHasError: false });
+      it('can set override setting hasError by default', () => {
+        const builder = new BaseBuilder().setError('errorStr', { overrideHasError: true });
 
         expect(builder.getOptions().hasError).to.be.undefined;
       });
