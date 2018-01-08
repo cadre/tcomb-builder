@@ -138,7 +138,7 @@ describe('BaseBuilder', () => {
       it('sets the hasError boolean in the options object', () => {
         const builder = new BaseBuilder().setHasError(true);
 
-        expect(builder.getOptions().hasError).to.equal(true);
+        expect(builder.getOptions().hasError).to.be.true;
       });
     });
 
@@ -148,6 +148,18 @@ describe('BaseBuilder', () => {
         const builder = new BaseBuilder().setError(error);
 
         expect(builder.getOptions().error).to.equal(error);
+      });
+
+      it('sets hasError to true in the options object by default', () => {
+        const builder = new BaseBuilder().setError('errorStr');
+
+        expect(builder.getOptions().hasError).to.be.true;
+      });
+
+      it('can set hasError to false in the options object', () => {
+        const builder = new BaseBuilder().setError('errorStr', { autoHasError: false });
+
+        expect(builder.getOptions().hasError).to.be.undefined;
       });
     });
 
@@ -225,7 +237,14 @@ describe('BaseBuilder', () => {
 
         expect(builder.getOptions()).to.deep.equal({
           disabled: true,
-          fields: { customField: { disabled: true, error: 'errorStr', label: 'foobar' } },
+          fields: {
+            customField: {
+              disabled: true,
+              error: 'errorStr',
+              hasError: true,
+              label: 'foobar',
+            },
+          },
           order: ['customField'],
         });
       });

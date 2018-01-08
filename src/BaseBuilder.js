@@ -142,13 +142,19 @@ export default class BaseBuilder {
 
   /**
    * Set the error key in the options object. Used to set errors from the API
-   * on a tcomb field.
+   * on a tcomb field. By default, also sets hasError to true if `error` is
+   * truthy and false otherwise. You can disable this behavior by passing in
+   * the `autoHasError` option in the config object.
    *
    * @param {string} error
    * @return {BaseBuilder}
    */
-  setError(error) {
-    return new this.constructor(this._state.mergeDeep({ options: { error } }));
+  setError(error, config = {}) {
+    const {
+      autoHasError = true,
+    } = config;
+    const builder = new this.constructor(this._state.mergeDeep({ options: { error } }));
+    return autoHasError ? builder.setHasError(!!error) : builder;
   }
 
   /**

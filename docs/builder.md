@@ -132,13 +132,22 @@ factory by passing a callback function to the `setLazyTemplateFactory` method.
 
 Set the error key in the options object. Since the function set by
 `setValidation` runs client-side validation on the form, `setError` is best
-used to set errors returned by the API directly onto the form.
+used to set errors returned by the API directly onto the form. By default,
+`.setError` also sets hasError to true if `error` is truthy and false
+otherwise. You can disable this behavior by passing in the `autoHasError`
+option in the config object.
 
 ### Example
 
 ```js
 const field = new BaseBuilder()
     .setError('There was an error.');
+
+// or
+
+const field = new BaseBuilder()
+    .setError('There was an error.', { autoHasError: false })
+    .setHasError(someOtherBooleanTest);
 ```
 
 ### Parameters
@@ -152,13 +161,15 @@ const field = new BaseBuilder()
 Set the hasError key in the options object. Used in conjuction with setError to
 force tcomb to display an error. Setting hasError to true won't stop the form
 from being submitted; in fact, it will get overwritten by tcomb-form on submit.
+The default behavior of `.setError` is to set `hasError` to true if `error` is
+truthy and false otherwise, so only use this function in special cases.
 
 ### Example
 
 ```js
 const field = new BaseBuilder()
     .setError('There was an API error.')
-    .setHasError(apiError || false);
+    .setHasError(!!apiError);
 ```
 
 ### Parameters
