@@ -3,7 +3,7 @@ import tcomb from 'tcomb-validation';
 import BaseBuilder from '../BaseBuilder';
 
 export default new BaseBuilder()
-  .setValidationErrorMessageFn(() => null)
+  .setValidation(() => null)
   .setTypeAndValidate(tcomb.Any, 'Static Text')
   .setLazyTemplateFactory(provider => provider.getStaticPage());
 

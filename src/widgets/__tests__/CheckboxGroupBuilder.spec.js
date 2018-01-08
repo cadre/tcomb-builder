@@ -6,50 +6,50 @@ const a = CheckboxBuilder.setLabel('a');
 const b = CheckboxBuilder.setLabel('b');
 const c = CheckboxBuilder.setLabel('c');
 
-const exampleCheckboxes = CheckboxGroupBuilder
-  .setValidationErrorMessageFn(validators.checkbox.minMax({ min: 0, max: 2 }))
+const checkboxGroupBuilder = CheckboxGroupBuilder
+  .setValidation(validators.checkbox.minMax({ min: 0, max: 2 }))
   .setField('a', a)
   .setField('b', b)
   .setField('c', c);
 
 describe('CheckboxGroupBuilder', () => {
   it('produces a tcomb Struct that validates correctly', () => {
-    const checkboxGroupType = exampleCheckboxes
-      .setValidationErrorMessageFn(validators.checkbox.minMax({ min: 0, max: 3 }))
+    const CheckboxGroupType = checkboxGroupBuilder
+      .setValidation(validators.checkbox.minMax({ min: 0, max: 3 }))
       .getType();
-    const checkbox = CheckboxBuilder.getType();
+    const CheckboxType = CheckboxBuilder.getType();
     const selections = {
-      a: checkbox(false),
-      b: checkbox(true),
-      c: checkbox(false),
+      a: CheckboxType(false),
+      b: CheckboxType(true),
+      c: CheckboxType(false),
     };
 
-    expect(checkboxGroupType(selections)).to.deep.equal({ a: false, b: true, c: false });
+    expect(CheckboxGroupType(selections)).to.deep.equal({ a: false, b: true, c: false });
   });
 
   it('produces an error message if number of selected values is less than the min', () => {
-    const Checkboxes = exampleCheckboxes
-      .setValidationErrorMessageFn(validators.checkbox.minMax({ min: 1, max: 1 }));
+    const builder = checkboxGroupBuilder
+      .setValidation(validators.checkbox.minMax({ min: 1, max: 1 }));
 
-    const CheckboxGroupType = Checkboxes.getType();
-    const options = Checkboxes._disableTemplates().getOptions();
+    const CheckboxGroupType = builder.getType();
 
     const selections = { a: false, b: false };
 
     expect(() => CheckboxGroupType(selections)).to.throw();
-    expect(options.error(selections)).to.equal('Please select at least 1 item.');
+    const errorStr = 'Please select at least 1 item.';
+    expect(CheckboxGroupType.getValidationErrorMessage(selections)).to.equal(errorStr);
   });
 
   it('produces an error message if number of selected values more than the max', () => {
-    const Checkboxes = exampleCheckboxes
-      .setValidationErrorMessageFn(validators.checkbox.minMax({ min: 1, max: 1 }));
+    const builder = checkboxGroupBuilder
+      .setValidation(validators.checkbox.minMax({ min: 1, max: 1 }));
 
-    const CheckboxGroupType = Checkboxes.getType();
-    const options = Checkboxes._disableTemplates().getOptions();
+    const CheckboxGroupType = builder.getType();
 
     const selections = { a: true, b: true };
 
     expect(() => CheckboxGroupType(selections)).to.throw();
-    expect(options.error(selections)).to.equal('Please select at most 1 item.');
+    const errorStr = 'Please select at most 1 item.';
+    expect(CheckboxGroupType.getValidationErrorMessage(selections)).to.equal(errorStr);
   });
 });

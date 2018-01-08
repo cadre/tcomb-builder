@@ -126,13 +126,63 @@ factory by passing a callback function to the `setLazyTemplateFactory` method.
 
 **factory**: `LazyTemplateInterface => TemplateFactory`
 
-## `setValidationErrorMessageFn(error)`
+## `setError(error)`
 
 ### Summary
 
-Set an error message function for this field in its options object. The error
-message function must conform to the same spec as that in `tcomb-validation`.
-It simply returns `null` if there is no error, and a `string` if an error
+Set the error key in the options object. Since the function set by
+`setValidation` runs client-side validation on the form, `setError` is best
+used to set errors returned by the API directly onto the form. By default,
+`.setError` also sets hasError to true if `error` is truthy and false
+otherwise. You can disable this behavior by passing in the `overrideHasError`
+option in the config object.
+
+### Example
+
+```js
+const field = new BaseBuilder()
+    .setError('There was an error.');
+
+// or
+
+const field = new BaseBuilder()
+    .setError('There was an error.', { overrideHasError: true })
+    .setHasError(someOtherBooleanTest);
+```
+
+### Parameters
+
+**error**: `string`
+
+## `setHasError(hasError)`
+
+### Summary
+
+Set the hasError key in the options object. Used in conjuction with setError to
+force tcomb to display an error. Setting hasError to true won't stop the form
+from being submitted; in fact, it will get overwritten by tcomb-form on submit.
+The default behavior of `.setError` is to set `hasError` to true if `error` is
+truthy and false otherwise, so only use this function in special cases.
+
+### Example
+
+```js
+const field = new BaseBuilder()
+    .setError('There was an API error.')
+    .setHasError(!!apiError);
+```
+
+### Parameters
+
+**hasError**: `boolean`
+
+## `setValidation(getValidationErrorMessage)`
+
+### Summary
+
+Set a validation function for this field as a static function on its type. The
+validation function must conform to the same spec as that in `tcomb-validation`
+where it returns `null` if there is no error, and a `string` if an error
 occurred.
 
 ### Example
@@ -143,20 +193,20 @@ function getValidationErrorMessage(value) {
 }
 
 const field = new BaseBuilder()
-    .setValidationErrorMessageFn(getValidationErrorMessage);
+    .setValidation(getValidationErrorMessage);
 ```
 
 ### Parameters
 
-**error**: `(value, path, context) => ?(string | ReactElement)`
+**getValidationErrorMessage**: `(value, path, context) => ?(string | ReactElement)`
 
-## `addValidationErrorMessageFn(error)`
+## `addValidation(getValidationErrorMessage)`
 
 ### Summary
 
-Adds an error message function to the existing function in the options object
-for this type. If there are no errors already set, then it is equivalent to
-`setValidationErrorMessageFn`.
+Adds a validation function to the existing function in the options object for
+this type. If there is no existing validation function, then it is equivalent
+to `setValidation`.
 
 ### Example
 
@@ -170,13 +220,13 @@ function truthyValidation(value) {
 }
 
 const field = new BaseBuilder()
-    .setValidationErrorMessageFn(booleanValidation)
-    .addValidationErrorMessageFn(truthyValidation);
+    .setValidation(booleanValidation)
+    .addValidation(truthyValidation);
 ```
 
 ### Parameters
 
-**error**: `(value, path, context) => ?(string | ReactElement)`
+**getValidationErrorMessage**: `(value, path, context) => ?(string | ReactElement)`
 
 ## `setField(key, fieldBuilder)`
 
@@ -240,10 +290,10 @@ export default RadioBuilder
 
 ### Summary
 
-Set the tcomb type of this builder. Similarly to the error field, the type must
-be passed in as a callback function in order to allow for arbitrary ordering of
-builder commands. The error function and fields are provided to you when you
-are creating the type.
+Set the tcomb type of this builder. The type must be passed in as a callback
+function in order to allow for arbitrary ordering of builder commands. The
+validation function and fields are provided to you when you are creating the
+type.
 
 ### Example
 

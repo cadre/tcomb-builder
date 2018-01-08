@@ -18,7 +18,7 @@ When you import the `validators` object, you can use its string length validator
 import * as validators from './path/to/validators';
 import TextBuilder from './path/to/TextBuilder';
 
-const zipCode = TextBuilder.setValidationErrorMessageFn(validators.text.length(5));
+const zipCode = TextBuilder.setValidation(validators.text.length(5));
 ```
 
 A common need is to perform several different validations on a single field.
@@ -49,7 +49,7 @@ const crossValidation = validators.combine([
 ]);
 
 const foodGroup = widgets.CheckboxGroupBuilder
-    .setValidationErrorMessageFn(crossValidation)
+    .setValidation(crossValidation)
     .setField('bananaStand', bananaStand)
     .setField('chickenDance', chickenDance)
     .setField('hugeMistake', hugeMistake)

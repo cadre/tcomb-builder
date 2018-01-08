@@ -6,7 +6,7 @@ const exampleStruct = StructBuilder
   .setField('second', TextBuilder.setLabel('second'));
 
 describe('StructBuilder', () => {
-  it('produces a StructType object that validates correctly', () => {
+  it('produces a valid struct type', () => {
     const StructType = exampleStruct.getType();
     const json = { first: 'abc', second: '123' };
 
@@ -14,7 +14,7 @@ describe('StructBuilder', () => {
     expect(StructType(json).second).to.equal('123');
   });
 
-  it('produces a StructType options object that validates correctly', () => {
+  it('produces a valid struct options object', () => {
     const actual = exampleStruct.getOptions();
 
     const expected = {

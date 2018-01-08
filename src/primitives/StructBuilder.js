@@ -17,4 +17,5 @@ class StructBuilder extends BaseBuilder {
 }
 
 export default new StructBuilder()
-  .setType((errorFn = () => {}, fields) => validation(tcomb.struct(fields), errorFn, 'Struct'));
+  .setValidation(() => null)
+  .setType((errorFn, fields) => validation(tcomb.struct(fields), errorFn, 'Struct'));

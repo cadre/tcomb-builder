@@ -53,7 +53,7 @@ const validation = validators.text.nonEmpty;
 
 const TextBuilder = new BaseBuilder()
   .setTypeAndValidate(tcomb.String, 'Text')
-  .setValidationErrorMessageFn(validation);
+  .setValidation(validation);
 
 const name = TextBuilder.setLabel('Name');
 
@@ -121,7 +121,7 @@ import { primitives, validators, widgets } from '../index';
 const name = widgets.TextBuilder.setLabel('Name');
 
 const dateOfBirth = widgets.TextBuilder
-  .setValidationErrorMessageFn(validators.date.birthdate)
+  .setValidation(validators.date.birthdate)
   .setLabel('Date of Birth');
 
 const occupation = widgets.TextBuilder
@@ -144,7 +144,7 @@ const crossValidation = validators.combine([
 ]);
 
 const foodGroup = widgets.CheckboxGroupBuilder
-  .setValidationErrorMessageFn(crossValidation)
+  .setValidation(crossValidation)
   .setField('bananaStand', bananaStand)
   .setField('chickenDance', chickenDance)
   .setField('hugeMistake', hugeMistake)
