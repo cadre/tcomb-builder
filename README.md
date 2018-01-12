@@ -14,9 +14,9 @@ _tcomb-builder is an immutable interface for [tcomb-form](https://github.com/gca
 
 1. Immutability
 
-2. Replaces deeply nested JSON options objects in your codebase
+2. Replaces deeply nested options objects in your codebase
 
-3. Yields a standard tcomb type and options JSON object
+3. Yields a standard tcomb type and options object
 
 ## Syntax
 
@@ -55,7 +55,7 @@ This code has a few problems:
    slightly modified validation, e.g. a max length restriction, because
    `getValidationErrorMessage` is set as a static function on the type.
 
-2. **Mutability makes the options object is hard to reuse.**
+2. **Mutability makes the options object hard to reuse.**
 
    Creating another field, e.g. 'Last Name', would require copy-pasting or
    `Object.assign`ing the options object.
@@ -102,12 +102,6 @@ This code is equivalent to the first example, with the following advantages:
    and options structures. tcomb-builder is _one_ interface for _all_ of tcomb,
    tcomb-validation, and tcomb-form. The parallel structures are maintained
    internally and accessed with the `.getType` and `.getOptions` methods.
-
-2. **Builders are easy to maintain.**
-
-   Most builders have only one level of indentation, and there is rarely a
-   reason to nest more than three levels. In most cases, your code is more
-   readable by assigning builders to well-named variables.
 
 ## Documentation
 
