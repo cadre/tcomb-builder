@@ -576,9 +576,9 @@ describe('BaseBuilder', () => {
       const error = () => 'Error';
       const error2 = () => null;
       const builder1 = new BaseBuilder()
-        .setValidationErrorMessageFn(error);
+        .setValidation(error);
       const builder2 = new BaseBuilder()
-        .setValidationErrorMessageFn(error2);
+        .setValidation(error2);
 
       expect(builder1.isEqual(builder2)).to.be.false;
     });
