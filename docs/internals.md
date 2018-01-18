@@ -16,8 +16,8 @@ Let's look at the type signatures of these methods:
 ### `setLazyTemplateFactory` and `setLazyTemplateProvider`
 
 ```js
-setLazyTemplateFactory : (LazyTemplateInterface -> tcomb.form.Component) => BaseBuilder
-builder.setLazyTemplateFactory(provider -> provider.getTextField())
+setLazyTemplateFactory : (LazyTemplateInterface -> tcomb.form.Component, string) => BaseBuilder
+builder.setLazyTemplateFactory(provider -> provider.getTextField(), 'TextField')
 
 setLazyTemplateProvider : LazyTemplateInterface => BaseBuilder
 builder.setLazyTemplateProvider(provider)
@@ -36,10 +36,14 @@ available to every text field contained therein.
 ### `setType`
 
 ```js
-setType : (errorFn: (value: string) => boolean, subTypes: Object) => TcombType
-builder.setType(errorFn => validation(tcomb.String, errorFn, 'String'));
+setType : (getValidationErrorMessage: any => string, subTypes: Object), name: string => TcombType
+builder.setType(getValidationErrorMessage => tcomb.refinement(
+  tcomb.String,
+  x => !tcomb.String.is(getValidationErrorMessage(x),
+  'String',
+), 'String')
 // or
-builder.setType((errorFn, fields) => tcomb.struct(fields));
+builder.setType((errorFn, fields) => tcomb.struct(fields), 'FooStruct');
 ```
 
 Here we see that `setType` takes a function which returns a tcomb type. That

@@ -17,5 +17,5 @@ class RadioBuilder extends SelectBuilder.constructor {
 }
 
 export default new RadioBuilder()
-  .setValidation(validators.shared.hasSelection)
-  .setLazyTemplateFactory(provider => provider.getRadio());
+  .setValidation(validators.shared.hasSelection, 'SelectionValidation')
+  .setLazyTemplateFactory(provider => provider.getRadio(), 'Radio');

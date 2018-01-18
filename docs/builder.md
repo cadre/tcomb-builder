@@ -58,25 +58,27 @@ display value in select and radio groups.
 
 ### Summary
 
-Set what properties should be automatically generated for you.
-Options are: 'labels', 'placeholders', 'none'.
+Set what properties should be automatically generated for you.  Options are:
+'labels', 'placeholders', 'none'.
 
 ### Parameters
 
 **text**: `string`
 
-## `setTransformer(transformer)`
+## `setTransformer(transformer, name)`
 
 ### Summary
 
 Set the transformer object in the options object for this type. The transformer
 object has two keys: `parse` and `format`. `parse` is a function describing how
 values will be transformed going into the type; `format` describes how they come
-out.
+out. The `name` parameter is used when checking for builder equality.
 
 ### Parameters
 
 **transformer**: `object` transformer
+
+**name**: `string`
 
 ## `setHelp(help)`
 
@@ -110,21 +112,24 @@ template factory using this method will supersede the lazy one.
 
 **factory**: `TemplateFactory`
 
-## `setLazyTemplateFactory(callback)`
+## `setLazyTemplateFactory(callback, name)`
 
 ### Summary
 
 Set a template provider for this field in its options object. Because the
 provider is accessed at builder evaluation time, it is necessary to set the
 factory by passing a callback function to the `setLazyTemplateFactory` method.
+The `name` parameter is used when checking for builder equality.
 
 ### Example
 
-`.setLazyTemplateFactory(provider => provider.getTextField())`
+`.setLazyTemplateFactory(provider => provider.getTextField(), 'TextField')`
 
 ### Parameters
 
 **factory**: `LazyTemplateInterface => TemplateFactory`
+
+**name**: `string`
 
 ## `setError(error)`
 
@@ -176,14 +181,14 @@ const field = new BaseBuilder()
 
 **hasError**: `boolean`
 
-## `setValidation(getValidationErrorMessage)`
+## `setValidation(getValidationErrorMessage, name)`
 
 ### Summary
 
 Set a validation function for this field as a static function on its type. The
 validation function must conform to the same spec as that in `tcomb-validation`
 where it returns `null` if there is no error, and a `string` if an error
-occurred.
+occurred. The `name` parameter is used when checking for builder equality.
 
 ### Example
 
@@ -193,20 +198,23 @@ function getValidationErrorMessage(value) {
 }
 
 const field = new BaseBuilder()
-    .setValidation(getValidationErrorMessage);
+    .setValidation(getValidationErrorMessage, 'BooleanValidation');
 ```
 
 ### Parameters
 
 **getValidationErrorMessage**: `(value, path, context) => ?(string | ReactElement)`
 
-## `addValidation(getValidationErrorMessage)`
+**name**: `string`
+
+## `addValidation(getValidationErrorMessage, name)`
 
 ### Summary
 
 Adds a validation function to the existing function in the options object for
 this type. If there is no existing validation function, then it is equivalent
-to `setValidation`.
+to `setValidation`. The `name` parameter is used when checking for builder
+equality.
 
 ### Example
 
@@ -220,13 +228,15 @@ function truthyValidation(value) {
 }
 
 const field = new BaseBuilder()
-    .setValidation(booleanValidation)
-    .addValidation(truthyValidation);
+    .setValidation(booleanValidation, 'BooleanValidation')
+    .addValidation(truthyValidation, 'TruthyValidation');
 ```
 
 ### Parameters
 
 **getValidationErrorMessage**: `(value, path, context) => ?(string | ReactElement)`
+
+**name**: `string`
 
 ## `setField(key, fieldBuilder)`
 
@@ -279,21 +289,21 @@ const noBuilder = new BaseBuilder()
 export default RadioBuilder
     .addSelectOption(yesBuilder)
     .addSelectOption(noBuilder)
-    .setTypeAndValidate(tcomb.enums.of([true, false]));
+    .setTypeAndValidate(tcomb.enums.of([true, false]), 'YesNoBuilder');
 ```
 
 ### Parameters
 
 **selectBuilder**: `BaseBuilder`
 
-## `setType(typeCombinator)`
+## `setType(typeCombinator, name)`
 
 ### Summary
 
 Set the tcomb type of this builder. The type must be passed in as a callback
 function in order to allow for arbitrary ordering of builder commands. The
 validation function and fields are provided to you when you are creating the
-type.
+type. The `name` parameter is used when checking for builder equality.
 
 ### Example
 
@@ -302,6 +312,8 @@ See the [`StructBuilder`](../src/primitives/StructBuilder.js)
 ### Parameters
 
 **typeCombinator**: `(errorFn: (value: string) => boolean, subTypes: Object) => TcombType`
+
+**name**: `string`
 
 ## `setTypeAndValidate(type, name)`
 
@@ -316,17 +328,20 @@ defined by the type.
 
 **name**: `string`
 
-## `setLazyTemplateProvider(provider)`
+## `setLazyTemplateProvider(provider, name)`
 
 ### Summary
 
 Sets a template provider instance. Set the provider only on the top level
-type, and it will be used to recursively generate templates for all
-sub-field options objects.
+type, and it will be used to recursively generate templates for all sub-field
+options objects. The `name` parameter is used when checking for builder
+equality.
 
 ### Parameters
 
 **provider**: `LazyTemplateInterface`
+
+**name**: `string`
 
 ## `makeOptional(isOptional = true)`
 
@@ -412,16 +427,19 @@ for telling the template how much padding to put around the component.
 
 **rhythm**: `string`
 
-## `setSort(sortComparator)`
+## `setSort(sortComparator, name)`
 
 ### Summary
 
 Set the sort function in the config object for this type. This function will be
-used to tell the template how to sort the values in the enum.
+used to tell the template how to sort the values in the enum. The `name`
+parameter is used when checking for builder equality.
 
 ### Parameters
 
 **order**: `(a, b) => number`
+
+**name**: `string`
 
 ## `_disableTemplates()`
 

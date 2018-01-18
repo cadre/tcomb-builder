@@ -3,7 +3,7 @@ import { validators, widgets } from '../index';
 const name = widgets.TextBuilder.setLabel('Name');
 
 const dateOfBirth = widgets.TextBuilder
-  .setValidation(validators.date.birthdate)
+  .setValidation(validators.date.birthdate, 'BirthdateValidation')
   .setLabel('Date of Birth');
 
 const occupation = widgets.TextBuilder
@@ -26,7 +26,7 @@ const crossValidation = validators.combine([
 ]);
 
 const foodGroup = widgets.CheckboxGroupBuilder
-  .setValidation(crossValidation)
+  .setValidation(crossValidation, 'CrossValidation')
   .setField('bananaStand', bananaStand)
   .setField('chickenDance', chickenDance)
   .setField('hugeMistake', hugeMistake)

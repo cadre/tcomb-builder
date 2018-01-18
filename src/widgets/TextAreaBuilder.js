@@ -1,4 +1,4 @@
 import TextBuilder from '../primitives/TextBuilder';
 
 export default TextBuilder
-  .setLazyTemplateFactory(provider => provider.getTextArea());
+  .setLazyTemplateFactory(provider => provider.getTextArea(), 'TextArea');

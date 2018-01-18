@@ -9,7 +9,7 @@ import {
 
 describe('index sanity test', () => {
   describe('provider can be accessed from a builder', () => {
-    const builder = CharacterProfileBuilder.setLazyTemplateProvider(mockProvider);
+    const builder = CharacterProfileBuilder.setLazyTemplateProvider(mockProvider, 'MockProvider');
     expect(() => builder.getType()).to.not.throw();
     expect(() => builder.getOptions()).to.not.throw();
   });

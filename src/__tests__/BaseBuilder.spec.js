@@ -95,7 +95,7 @@ describe('BaseBuilder', () => {
           }
           return 0;
         };
-        const builder = new BaseBuilder().setSort(sortComparator);
+        const builder = new BaseBuilder().setSort(sortComparator, 'LabelSort');
 
         expect(builder.getOptions().config).to.deep.equal({ sortComparator });
       });
@@ -167,8 +167,8 @@ describe('BaseBuilder', () => {
       it('can set a validation function', () => {
         const fn = () => { ({ foo: 'bar' }); };
         const builder = new BaseBuilder()
-          .setType(() => tcomb.String)
-          .setValidation(fn);
+          .setType(() => tcomb.String, 'String')
+          .setValidation(fn, 'FooBarValidation');
 
         expect(builder.getType().getValidationErrorMessage).to.equal(fn);
       });
@@ -177,7 +177,7 @@ describe('BaseBuilder', () => {
     describe('setTransformer()', () => {
       it('can set a transformer option function', () => {
         const fn = () => { ({ foo: 'bar' }); };
-        const builder = new BaseBuilder().setTransformer(fn);
+        const builder = new BaseBuilder().setTransformer(fn, 'FooTransformer');
 
         expect(builder.getOptions()).to.deep.equal({ transformer: fn });
       });
@@ -188,8 +188,8 @@ describe('BaseBuilder', () => {
         it('sets the validation function', () => {
           const fn = items => (items.length > 1 ? null : 'Too short');
           const builder = new BaseBuilder()
-            .setType(() => tcomb.String)
-            .addValidation(fn);
+            .setType(() => tcomb.String, 'String')
+            .addValidation(fn, 'LengthValidation');
           expect(builder.getType().getValidationErrorMessage(['a'])).to.equal('Too short');
         });
       });
@@ -200,12 +200,12 @@ describe('BaseBuilder', () => {
           const fn2 = items => (items[0] === 'foo' ? null : 'Wrong first element');
 
           const builder = new BaseBuilder()
-            .setType(() => tcomb.String)
-            .setValidation(fn1);
+            .setType(() => tcomb.String, 'String')
+            .setValidation(fn1, 'LengthValidation');
 
           expect(builder.getType().getValidationErrorMessage(['a', 'b'])).to.equal(null);
 
-          const combinedBuilder = builder.addValidation(fn2);
+          const combinedBuilder = builder.addValidation(fn2, 'FirstElementValidation');
 
           const combinedType = combinedBuilder.getType();
           expect(combinedType.getValidationErrorMessage(['a', 'b'])).to.contain('first');
@@ -295,7 +295,7 @@ describe('BaseBuilder', () => {
       context('a provider is not provided but a _templateCallback is', () => {
         it('throws if a _templateCallback is provided without a provider', () => {
           const builder = new BaseBuilder()
-            .setLazyTemplateFactory(provider => provider.doAThing());
+            .setLazyTemplateFactory(provider => provider.doAThing(), 'AThing');
 
           expect(() => builder.getOptions()).to.throw('no provider was set');
         });
@@ -304,7 +304,7 @@ describe('BaseBuilder', () => {
       context('a provider is provided but a _templateCallback is not', () => {
         it('does not throw', () => {
           const builder = new BaseBuilder()
-            .setLazyTemplateProvider('blah');
+            .setLazyTemplateProvider('blah', 'BlahProvider');
 
           expect(() => builder.getOptions()).to.not.throw();
         });
@@ -320,17 +320,20 @@ describe('BaseBuilder', () => {
             setF2: () => { f2 = true; },
             setF3: () => { f3 = true; },
           };
-          const field1 = new BaseBuilder().setLazyTemplateFactory(provider => provider.setF1());
+          const field1 = new BaseBuilder()
+            .setLazyTemplateFactory(provider => provider.setF1(), 'F1');
           const field2 = new BaseBuilder()
-            .setLazyTemplateFactory(provider => provider.setF2())
+            .setLazyTemplateFactory(provider => provider.setF2(), 'F2')
             .setField('field1', field1);
-          const field3 = new BaseBuilder().setLazyTemplateFactory(provider => provider.setF3());
+          const field3 = new BaseBuilder()
+            .setLazyTemplateFactory(provider => provider.setF3(), 'F3');
 
           const builder = new BaseBuilder()
             .setField('field2', field2)
             .setField('field3', field3)
-            .setLazyTemplateProvider(lazyTemplateProvider);
+            .setLazyTemplateProvider(lazyTemplateProvider, 'DefaultProvider');
 
+          console.log('Start provider test');
           builder.getOptions();
 
           expect(f1).to.be.true;
@@ -348,8 +351,8 @@ describe('BaseBuilder', () => {
           const factory = 'factory';
           const builder = new BaseBuilder()
             .setTemplateFactory(factory)
-            .setLazyTemplateFactory(provider => provider.setF1())
-            .setLazyTemplateProvider(lazyTemplateProvider);
+            .setLazyTemplateFactory(provider => provider.setF1(), 'F1')
+            .setLazyTemplateProvider(lazyTemplateProvider, 'DefaultProvider');
 
           const options = builder.getOptions();
           expect(options.factory).to.equal(factory);
@@ -407,7 +410,7 @@ describe('BaseBuilder', () => {
     context('no sub-fields have been set', () => {
       context('no error message has been set', () => {
         it('returns the type of the current builder', () => {
-          const builder = new BaseBuilder().setType(() => tcomb.String);
+          const builder = new BaseBuilder().setType(() => tcomb.String, 'String');
 
           expect(builder.getType()).to.equal(tcomb.String);
         });
@@ -422,11 +425,11 @@ describe('BaseBuilder', () => {
     context('sub-fields have been set', () => {
       context('no builder types are dependent on the fieldset', () => {
         it('returns the type of only the top level builder', () => {
-          const field1 = new BaseBuilder().setType(() => tcomb.String);
-          const field2 = new BaseBuilder().setType(() => tcomb.String);
+          const field1 = new BaseBuilder().setType(() => tcomb.String, 'String');
+          const field2 = new BaseBuilder().setType(() => tcomb.String, 'String');
 
           const builder = new BaseBuilder()
-            .setType(() => tcomb.String)
+            .setType(() => tcomb.String, 'String')
             .setField('field1', field1)
             .setField('field2', field2);
 
@@ -438,18 +441,18 @@ describe('BaseBuilder', () => {
         it('returns the type of the builder with the context of the sub-fields', () => {
           const validation1 = () => 'foo';
           const field1 = new BaseBuilder()
-            .setValidation(validation1)
-            .setType(() => tcomb.String);
+            .setValidation(validation1, 'FooValidation')
+            .setType(() => tcomb.String, 'String');
 
           const validation2 = () => 'bar';
           const field2 = new BaseBuilder()
-            .setValidation(validation2)
-            .setType(() => tcomb.Number);
+            .setValidation(validation2, 'BarValidation')
+            .setType(() => tcomb.Number, 'Number');
 
           const builderValidation = () => 'builder';
           const builder = new BaseBuilder()
-            .setType((error, fields) => ({ foo: fields }))
-            .setValidation(builderValidation)
+            .setType((error, fields) => ({ foo: fields }), 'Foo')
+            .setValidation(builderValidation, 'BuilderValidation')
             .setField('field1', field1)
             .setField('field2', field2);
 
@@ -466,7 +469,7 @@ describe('BaseBuilder', () => {
         context('single field', () => {
           it('does not throw when no value is provided', () => {
             const type = new BaseBuilder()
-              .setType(() => tcomb.String)
+              .setType(() => tcomb.String, 'String')
               .makeOptional()
               .getType();
 
@@ -478,15 +481,15 @@ describe('BaseBuilder', () => {
         context('compound type', () => {
           it('does not throw when no value is provided', () => {
             const field1 = new BaseBuilder()
-              .setType(() => tcomb.String);
+              .setType(() => tcomb.String, 'String');
 
             const field2 = new BaseBuilder()
-              .setType(() => tcomb.String);
+              .setType(() => tcomb.String, 'String');
 
             const page = new BaseBuilder()
               .setField('field1', field1)
               .setField('field2', field2)
-              .setType((e, fields) => tcomb.struct(fields))
+              .setType((e, fields) => tcomb.struct(fields), 'FooStruct')
               .makeOptional()
               .getType();
 
@@ -500,7 +503,7 @@ describe('BaseBuilder', () => {
         context('single field', () => {
           it('throws when no value is provided', () => {
             const type = new BaseBuilder()
-              .setType(() => tcomb.String)
+              .setType(() => tcomb.String, 'String')
               .getType();
 
             expect(() => type()).to.throw();
@@ -511,15 +514,15 @@ describe('BaseBuilder', () => {
         context('compound type', () => {
           it('throws when no value is provided', () => {
             const field1 = new BaseBuilder()
-              .setType(() => tcomb.String);
+              .setType(() => tcomb.String, 'String');
 
             const field2 = new BaseBuilder()
-              .setType(() => tcomb.String);
+              .setType(() => tcomb.String, 'String');
 
             const page = new BaseBuilder()
               .setField('field1', field1)
               .setField('field2', field2)
-              .setType((e, fields) => tcomb.struct(fields))
+              .setType((e, fields) => tcomb.struct(fields), 'FooStruct')
               .getType();
 
             expect(() => page()).to.throw();
@@ -576,9 +579,9 @@ describe('BaseBuilder', () => {
       const error = () => 'Error';
       const error2 = () => null;
       const builder1 = new BaseBuilder()
-        .setValidation(error);
+        .setValidation(error, 'ErrorValidation');
       const builder2 = new BaseBuilder()
-        .setValidation(error2);
+        .setValidation(error2, 'NullValidation');
 
       expect(builder1.isEqual(builder2)).to.be.false;
     });

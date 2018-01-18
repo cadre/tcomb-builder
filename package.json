@@ -12,7 +12,7 @@
   "scripts": {
     "lint": "eslint --cache '**/*.js'",
     "prepublish": "babel -d dist src",
-    "test": "NODE_ENV=test mocha --opts mocha.opts 'src/**/__tests__/**/*.js'",
+    "test": "NODE_ENV=test mocha --opts mocha.opts 'src/**/__tests__/**/*.js' -g 'for each sub-field'",
     "test:instrument": "NODE_ENV=test nyc --all --cache npm test",
     "test:junit": "NODE_ENV=test nyc --all --cache --reporter=cobertura --report-dir=./reports/coverage mocha --opts mocha.opts --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/junit-report.xml 'src/**/__tests__/**/*.js'",
     "watch:test": "nodemon -w ./src -e js -x 'npm test'"
