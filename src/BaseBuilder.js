@@ -363,10 +363,10 @@ export default class BaseBuilder {
    * @return {BaseBuilder}
    */
   setLazyTemplateProvider(provider, name) {
-    return new this.constructor(this._state.merge({
-      _lazyTemplateProvider: provider,
-      _lazyTemplateProviderName: name,
-    }));
+    // .merge() cannot be used here because it coerces provider into a Map.
+    return new this.constructor(this._state
+      .set('_lazyTemplateProvider', provider)
+      .set('_lazyTemplateProviderName', name));
   }
 
   /**
@@ -585,8 +585,6 @@ export default class BaseBuilder {
     // If a template callback exists, realize the template, merge any
     // sub-fields, and return the resulting options object.
     const templateProviderCallback = this._state.get('_templateProviderCallback');
-    console.log('provider: ', provider);
-    console.log(provider['setF1']);
     const options = !hasConcreteTemplateFactory && templateProviderCallback && !disableTemplates
       ? this._state.mergeDeep({ options: { factory: templateProviderCallback(provider) } })
       : this._state;

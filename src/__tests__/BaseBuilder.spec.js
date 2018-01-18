@@ -333,7 +333,6 @@ describe('BaseBuilder', () => {
             .setField('field3', field3)
             .setLazyTemplateProvider(lazyTemplateProvider, 'DefaultProvider');
 
-          console.log('Start provider test');
           builder.getOptions();
 
           expect(f1).to.be.true;
