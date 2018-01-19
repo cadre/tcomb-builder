@@ -3,51 +3,73 @@ import tcomb from 'tcomb-validation';
 
 import * as validators from './validators';
 
-function keyIn(...keys) {
-  const keySet = Immutable.Set(keys);
-  return (v, k) => keySet.has(k);
-}
-
 const initialState = {
   // Used to internally set fields which will later be realized into type and
   // options objects.
   _fieldBuilders: Immutable.Map(),
 
+  _unionBuilders: Immutable.List(),
+
   // Used to wrap this builder's type in a maybe to make it optional.
   _isOptional: false,
-
-  // Used to keep track of validation functions; when the builder is realized,
-  // it's added as a static function on the type.
-  _getValidationErrorMessage: null,
-  _getValidationErrorMessageNames: Immutable.List(),
-
-  // Used to lazily close over the `_lazyTemplateProvider` until the options blob is
-  // realized.
-  _templateProviderCallback: null,
-  _templateProviderCallbackName: null,
-
-  // Used to recursively provide the template provider to all fields which
-  // define a template in the options object.
-  _lazyTemplateProvider: null,
-  _lazyTemplateProviderName: null,
-
-  // Used to lazily set the type internally in the builder.
-  _type: null,
-  _typeName: null,
-
-  // Names for functions set in the options blob.
-  _transformerName: null,
-  _sortComparatorName: null,
 
   // Directly returned from the builder.
   options: Immutable.Map(),
 
-  _unionBuilders: Immutable.List(),
+  builderFunctions: Immutable.Map({
+    // Used to keep track of validation functions; when the builder is realized,
+    // it's added as a static function on the type.
+    _getValidationErrorMessage: Immutable.Map({
+      name: null,
+      value: null,
+    }),
+    // Used to lazily close over the `_lazyTemplateProvider` until the options blob is
+    // realized.
+    _templateProviderCallback: Immutable.Map({
+      name: null,
+      value: null,
+    }),
+    // Used to recursively provide the template provider to all fields which
+    // define a template in the options object.
+    _lazyTemplateProvider: Immutable.Map({
+      name: null,
+      value: null,
+    }),
+    // Used to lazily set the type internally in the builder.
+    _type: Immutable.Map({
+      name: null,
+      value: null,
+    }),
+    // Used to keep track of a union's dispatch function until the builder is
+    // realized.
+    _dispatch: Immutable.Map({
+      name: null,
+      value: null,
+    }),
+  }),
+
+  optionsFunctions: Immutable.Map({
+    transformer: Immutable.Map({
+      name: null,
+      value: null,
+    }),
+  }),
+
+  configFunctions: Immutable.Map({
+    sortComparator: Immutable.Map({
+      name: null,
+      value: null,
+    }),
+  }),
 };
 
 export default class BaseBuilder {
   constructor(state = Immutable.Map(initialState)) {
     this._state = state;
+  }
+
+  _getBuilderFunction(id) {
+    return this._state.getIn(['builderFunctions', id, 'value'], null);
   }
 
   /**
@@ -151,10 +173,8 @@ export default class BaseBuilder {
    * @return {BaseBuilder}
    */
   setLazyTemplateFactory(callback, name) {
-    return new this.constructor(this._state.merge({
-      _templateProviderCallback: callback,
-      _templateProviderCallbackName: name,
-    }));
+    return new this.constructor(this._state
+      .mergeIn(['builderFunctions', '_templateProviderCallback'], { name, value: callback }));
   }
 
   /**
@@ -195,13 +215,8 @@ export default class BaseBuilder {
    */
   setValidation(getValidationErrorMessage, name) {
     return new this.constructor(this._state
-      .set(
-        '_getValidationErrorMessage',
-        getValidationErrorMessage,
-      ).update(
-        '_getValidationErrorMessageNames',
-        arr => arr.clear().push(name),
-      ));
+      .mergeIn(['builderFunctions', '_getValidationErrorMessage'],
+        { name, value: getValidationErrorMessage }));
   }
 
   /**
@@ -213,10 +228,8 @@ export default class BaseBuilder {
    * @return {BaseBuilder}
    */
   setTransformer(transformer, name) {
-    return new this.constructor(this._state.mergeDeep({
-      options: { transformer },
-      _transformerName: name,
-    }));
+    return new this.constructor(this._state
+      .mergeIn(['optionsFunctions', 'transformer'], { name, value: transformer }));
   }
 
   /**
@@ -228,8 +241,8 @@ export default class BaseBuilder {
    * @return {BaseBuilder}
    */
   setSort(sortComparator, name) {
-    return new this.constructor(this._state.set('_sortComparatorName', name))
-      .setConfig({ sortComparator });
+    return new this.constructor(this._state
+      .mergeIn(['configFunctions', 'sortComparator'], { name, value: sortComparator }));
   }
 
   /**
@@ -243,15 +256,16 @@ export default class BaseBuilder {
    * @return {BaseBuilder}
    */
   addValidation(getValidationErrorMessage, name) {
-    const existingFn = this._state.get('_getValidationErrorMessage', null);
+    const existingFn = this._getBuilderFunction('_getValidationErrorMessage');
     if (!existingFn) {
       return this.setValidation(getValidationErrorMessage, name);
     }
 
-    return this.setValidation(
-      validators.combine([existingFn, getValidationErrorMessage]),
-      name,
-    );
+    return new this.constructor(this._state
+      .setIn(['builderFunctions', '_getValidationErrorMessage', 'value'],
+        validators.combine([existingFn, getValidationErrorMessage]))
+      .updateIn(['builderFunctions', '_getValidationErrorMessage', 'name'],
+        oldName => (!oldName ? oldName : oldName + name)));
   }
 
   /**
@@ -323,11 +337,9 @@ export default class BaseBuilder {
    * @return {BaseBuilder}
    */
   setType(typeCombinator, name) {
-    return new this.constructor(this._state.merge({
-      _type: (getValidationErrorMessage, subTypes) =>
-        typeCombinator(getValidationErrorMessage, subTypes),
-      _typeName: name,
-    }));
+    return new this.constructor(this._state
+      .mergeIn(['builderFunctions', '_type'],
+        { name, value: (errorFn, subTypes) => typeCombinator(errorFn, subTypes) }));
   }
 
   /**
@@ -365,8 +377,8 @@ export default class BaseBuilder {
   setLazyTemplateProvider(provider, name) {
     // .merge() cannot be used here because it coerces provider into a Map.
     return new this.constructor(this._state
-      .set('_lazyTemplateProvider', provider)
-      .set('_lazyTemplateProviderName', name));
+      .setIn(['builderFunctions', '_lazyTemplateProvider', 'value'], provider)
+      .setIn(['builderFunctions', '_lazyTemplateProvider', 'name'], name));
   }
 
   /**
@@ -452,38 +464,37 @@ export default class BaseBuilder {
     return this.setConfig({ rhythm });
   }
 
-  getComparables() {
-    return this._state.filterNot(keyIn(
-      '_dispatch',
-      '_fieldBuilders',
-      '_lazyTemplateProvider',
-      '_templateProviderCallback',
-      '_unionBuilders',
-    ));
-  }
-
-  isEqual(otherBuilder) {
-    if (!otherBuilder) {
+  /**
+   * Test for builder value equality.
+   *
+   * @param {BaseBuilder} other
+   * @return {boolean}
+   */
+  isEqual(other) {
+    if (!other) {
       return false;
     }
 
-    if (otherBuilder === this) {
+    if (other === this) {
       return true;
     }
 
-    const equalFields = this._state.get('_fieldBuilders').entrySeq().every(entry => {
-      const key = entry[0];
-      const field = entry[1];
-
-      return field.isEqual(otherBuilder._state.getIn(['_fieldBuilders', key]));
-    });
+    const equalFields = this._state.get('_fieldBuilders').every((field, key) =>
+      field.isEqual(other._state.getIn(['_fieldBuilders', key])));
 
     const equalUnions = this._state.get('_unionBuilders').every((field, i) =>
-      field.isEqual(otherBuilder._state.getIn(['_unionBuilders', i])));
+      field.isEqual(other._state.getIn(['_unionBuilders', i])));
 
-    return equalFields &&
-      equalUnions &&
-      otherBuilder.getComparables().equals(this.getComparables());
+    const equalFunctions = ['builderFunctions', 'optionsFunctions', 'configFunctions']
+      .map(type => this._state.get(type)
+        .every((value, key) => value.get('name') === other._state.getIn([type, key, 'name'])))
+      .every(value => value);
+
+    return equalFields
+      && equalUnions
+      && equalFunctions
+      && this._state.get('_isOptional') === other._state.get('_isOptional')
+      && this._state.get('options').equals(other._state.get('options'));
   }
 
   /**
@@ -496,7 +507,8 @@ export default class BaseBuilder {
   getType() {
     const type = () => {
       if (!this._state.get('_unionBuilders').isEmpty()) {
-        if (!this._state.has('_dispatch')) {
+        const dispatch = this._getBuilderFunction('_dispatch');
+        if (!dispatch) {
           throw new Error('No dispatch function found for union type');
         }
 
@@ -508,7 +520,7 @@ export default class BaseBuilder {
         // When setting a dispatch function on the builder, return a builder.
         // Here, take that builder and convert it into a type.
         union.dispatch = value => {
-          const dispatchedBuilder = this._state.get('_dispatch')(value);
+          const dispatchedBuilder = dispatch(value);
           const typeIndex = unionBuilders.indexOf(dispatchedBuilder);
           if (typeIndex === -1) {
             throw new Error('Dispatched builder was not found within the union set');
@@ -518,7 +530,7 @@ export default class BaseBuilder {
         return union;
       }
 
-      const Type = this._state.get('_type');
+      const Type = this._getBuilderFunction('_type');
       if (!Type) {
         throw new Error('No type was set for the current builder');
       }
@@ -532,7 +544,7 @@ export default class BaseBuilder {
         return acc.set(key, field.getType());
       }, Immutable.Map()).toJS();
 
-      const getValidationErrorMessage = this._state.get('_getValidationErrorMessage');
+      const getValidationErrorMessage = this._getBuilderFunction('_getValidationErrorMessage');
       const typeInstance = Type(
         getValidationErrorMessage,
         subTypes,
@@ -556,7 +568,7 @@ export default class BaseBuilder {
       disableTemplates = this._state.get('_disableTemplates', false),
     } = config;
 
-    const provider = lazyTemplateProvider || this._state.get('_lazyTemplateProvider');
+    const provider = lazyTemplateProvider || this._getBuilderFunction('_lazyTemplateProvider');
 
     const unionBuilders = this._state.get('_unionBuilders');
     if (!unionBuilders.isEmpty()) {
@@ -565,33 +577,38 @@ export default class BaseBuilder {
     }
 
     const hasConcreteTemplateFactory = this._state.hasIn(['options', 'factory']);
+    const templateProviderCallback = this._getBuilderFunction('_templateProviderCallback');
 
     if (!hasConcreteTemplateFactory
-        && this._state.get('_templateProviderCallback')
+        && templateProviderCallback
         && !provider
         && !disableTemplates) {
       throw new Error('A template callback function was specified, but no provider was set');
     }
 
     // Recursively build up the options object from every field.
-    const fields = this._state.get('_fieldBuilders').entrySeq().reduce((acc, entry) => {
-      const key = entry[0];
-      const field = entry[1];
-
-      return acc.setIn(['options', 'fields', key],
-        field.getOptions(provider, { disableTemplates }));
-    }, Immutable.Map()).toJS();
+    const fields = this._state.get('_fieldBuilders').reduce((acc, field, key) => (
+      acc.setIn(['options', 'fields', key], field.getOptions(provider, { disableTemplates }))
+    ), Immutable.Map()).toJS();
 
     // If a template callback exists, realize the template, merge any
     // sub-fields, and return the resulting options object.
-    const templateProviderCallback = this._state.get('_templateProviderCallback');
     const options = !hasConcreteTemplateFactory && templateProviderCallback && !disableTemplates
       ? this._state.mergeDeep({ options: { factory: templateProviderCallback(provider) } })
       : this._state;
 
+    const flattenFunctions = functions => functions
+      .filter(value => !!value.get('name'))
+      .reduce((acc, value, key) => acc.set(key, value.get('value')), Immutable.Map());
+
+    const optionsFunctions = flattenFunctions(this._state.get('optionsFunctions'));
+    const configFunctions = flattenFunctions(this._state.get('configFunctions'));
+
     return options
       .mergeDeep(fields)
       .get('options')
+      .merge(optionsFunctions.isEmpty() ? {} : optionsFunctions)
+      .merge(configFunctions.isEmpty() ? {} : { config: configFunctions })
       .toJS();
   }
 }

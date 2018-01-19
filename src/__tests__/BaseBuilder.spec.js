@@ -533,17 +533,18 @@ describe('BaseBuilder', () => {
   });
 
   describe('isEqual()', () => {
-    it('returns true with passed the same instance', () => {
+    it('returns false if passed null or undefined', () => {
+      const builder = new BaseBuilder();
+      expect(builder.isEqual(null)).to.be.false;
+      expect(builder.isEqual(undefined)).to.be.false;
+    });
+
+    it('returns true when passed the same instance', () => {
       const builder = new BaseBuilder();
       expect(builder.isEqual(builder)).to.be.true;
     });
 
-    it('can compare equivalent builders', () => {
-      const builder = new BaseBuilder();
-      expect(builder.isEqual(builder)).to.be.true;
-    });
-
-    it('can compare equivalent builders', () => {
+    it('returns true if all fields are equal', () => {
       const builder1 = new BaseBuilder()
         .setField('subfield1', new BaseBuilder())
         .setField('subfield2', new BaseBuilder());
@@ -554,7 +555,29 @@ describe('BaseBuilder', () => {
       expect(builder1.isEqual(builder2)).to.be.true;
     });
 
-    it('can compare inequivalent builders', () => {
+    it('returns false if any fields are not equal', () => {
+      const builder1 = new BaseBuilder()
+        .setField('subfield1', new BaseBuilder())
+        .setField('subfield2', new BaseBuilder());
+      const builder2 = new BaseBuilder()
+        .setField('foo', new BaseBuilder().setLabel('Foo'))
+        .setField('subfield2', new BaseBuilder());
+
+      expect(builder1.isEqual(builder2)).to.be.false;
+    });
+
+    it('returns true if both configs are equal', () => {
+      const builder1 = new BaseBuilder()
+        .setField('subfield1', new BaseBuilder()
+          .setConfig({ foo: 'bar' }));
+      const builder2 = new BaseBuilder()
+        .setField('subfield1', new BaseBuilder()
+          .setConfig({ foo: 'bar' }));
+
+      expect(builder1.isEqual(builder2)).to.be.true;
+    });
+
+    it('returns false if configs are not equal', () => {
       const builder1 = new BaseBuilder()
         .setField('subfield1', new BaseBuilder()
           .setConfig({ foo: 'bar' }))
@@ -567,20 +590,121 @@ describe('BaseBuilder', () => {
       expect(builder1.isEqual(builder2)).to.be.false;
     });
 
-    it('can compare inequivalent builders', () => {
+    it('returns true if options fields are equal', () => {
+      const builder1 = new BaseBuilder().setLabel('Foo');
+      const builder2 = new BaseBuilder().setLabel('Foo');
+
+      expect(builder1.isEqual(builder2)).to.be.true;
+    });
+
+    it('returns false if options fields are not equal', () => {
       const builder1 = new BaseBuilder().setLabel('Foo');
       const builder2 = new BaseBuilder().setLabel('Bar');
 
       expect(builder1.isEqual(builder2)).to.be.false;
     });
 
-    it('can compare inequivalent builders', () => {
-      const error = () => 'Error';
-      const error2 = () => null;
+    it('returns true if two builder functions have the same name', () => {
+      // Different functions, same name.
+      const factory1 = () => 'Error';
+      const factory2 = () => 'Error';
       const builder1 = new BaseBuilder()
-        .setValidation(error, 'ErrorValidation');
+        .setLazyTemplateFactory(factory1, 'Factory1');
       const builder2 = new BaseBuilder()
-        .setValidation(error2, 'NullValidation');
+        .setLazyTemplateFactory(factory2, 'Factory1');
+
+      expect(builder1.isEqual(builder2)).to.be.true;
+    });
+
+    it('returns false if two builder functions have different names', () => {
+      {
+        // Different functions, different names.
+        const factory1 = () => 'Error';
+        const factory2 = () => 'Error';
+        const builder1 = new BaseBuilder()
+          .setLazyTemplateFactory(factory1, 'Factory1');
+        const builder2 = new BaseBuilder()
+          .setLazyTemplateFactory(factory2, 'Factory2');
+
+        expect(builder1.isEqual(builder2)).to.be.false;
+      }
+
+      {
+        // Same function, different names.
+        const factory = () => 'Error';
+        const builder1 = new BaseBuilder()
+          .setLazyTemplateFactory(factory, 'Factory1');
+        const builder2 = new BaseBuilder()
+          .setLazyTemplateFactory(factory, 'Factory2');
+
+        expect(builder1.isEqual(builder2)).to.be.false;
+      }
+    });
+
+    it('returns true if validation functions are set in the same order', () => {
+      const error = () => 'Error';
+      const builder1 = new BaseBuilder()
+        .setValidation(error, 'Error1')
+        .addValidation(error, 'Error2');
+      const builder2 = new BaseBuilder()
+        .setValidation(error, 'Error1')
+        .addValidation(error, 'Error2');
+
+      expect(builder1.isEqual(builder2)).to.be.true;
+    });
+
+    it('returns false if validation functions are set in a different order', () => {
+      const error = () => 'Error';
+      const builder1 = new BaseBuilder()
+        .setValidation(error, 'Error1')
+        .addValidation(error, 'Error2');
+      const builder2 = new BaseBuilder()
+        .setValidation(error, 'Error2')
+        .addValidation(error, 'Error1');
+
+      expect(builder1.isEqual(builder2)).to.be.false;
+    });
+
+    it('returns true if two options functions have the same name', () => {
+      const transformer1 = () => 'Fn1';
+      const transformer2 = () => 'Fn2';
+      const builder1 = new BaseBuilder()
+        .setTransformer(transformer1, 'Transformer1');
+      const builder2 = new BaseBuilder()
+        .setTransformer(transformer2, 'Transformer1');
+
+      expect(builder1.isEqual(builder2)).to.be.true;
+    });
+
+    it('returns false if two options functions have a different name', () => {
+      const transformer1 = () => 'Fn1';
+      const transformer2 = () => 'Fn2';
+      const builder1 = new BaseBuilder()
+        .setTransformer(transformer1, 'Transformer1');
+      const builder2 = new BaseBuilder()
+        .setTransformer(transformer2, 'Transformer2');
+
+      expect(builder1.isEqual(builder2)).to.be.false;
+    });
+
+    it('returns true if two config functions have the same name', () => {
+      const comparator1 = () => 'Fn1';
+      const comparator2 = () => 'Fn2';
+      const builder1 = new BaseBuilder()
+        .setSort(comparator1, 'Comparator1');
+      const builder2 = new BaseBuilder()
+        .setSort(comparator2, 'Comparator1');
+
+      expect(builder1.isEqual(builder2)).to.be.true;
+    });
+
+    it('returns false if two config functions have a different name', () => {
+      const comparator1 = () => 'Fn1';
+      const comparator2 = () => 'Fn2';
+      const builder1 = new BaseBuilder()
+        .setSort(comparator1, 'Comparator1');
+      const builder2 = new BaseBuilder()
+        .setSort(comparator2, 'Comparator2');
 
       expect(builder1.isEqual(builder2)).to.be.false;
     });

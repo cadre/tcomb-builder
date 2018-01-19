@@ -449,6 +449,16 @@ Disable template realization for this builder and any fields that it contains.
 This method is intended to be used only in unit tests for surveys where
 template callbacks are set, but no template provider is made available.
 
+## `isEqual()`
+
+### Summary
+
+Test for builder value equality.
+
+### Parameters
+
+**other**: `BaseBuilder`
+
 ## `getType()`
 
 ### Summary

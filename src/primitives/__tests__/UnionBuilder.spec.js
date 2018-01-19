@@ -79,7 +79,7 @@ describe('UnionBuilder', () => {
   });
 
   describe('isEqual', () => {
-    it('can compare inequivalent builders', () => {
+    it('returns true if all unions are equal', () => {
       const international = StructBuilder
         .setField('country', TextBuilder);
       const usa = StructBuilder
@@ -103,6 +103,35 @@ describe('UnionBuilder', () => {
         ));
 
       expect(countriesBuilder.isEqual(otherCountriesBuilder)).to.be.true;
+    });
+
+    it('returns false if any unions are not equal', () => {
+      // Usa has zip.
+      const international = StructBuilder
+        .setField('country', TextBuilder);
+      const usa = StructBuilder
+        .setField('country', TextBuilder)
+        .setField('state', TextBuilder)
+        .setField('zip', TextBuilder);
+      const countriesBuilder = UnionBuilder
+        .setUnion([international, usa])
+        .setDispatch(value => (
+          value.country === 'usa' ? usa : international
+        ));
+
+      // Usa does not have zip.
+      const otherInternational = StructBuilder
+        .setField('country', TextBuilder);
+      const otherUsa = StructBuilder
+        .setField('country', TextBuilder)
+        .setField('state', TextBuilder);
+      const otherCountriesBuilder = UnionBuilder
+        .setUnion([otherInternational, otherUsa])
+        .setDispatch(value => (
+          value.country === 'usa' ? otherUsa : otherInternational
+        ));
+
+      expect(countriesBuilder.isEqual(otherCountriesBuilder)).to.be.false;
     });
   });
 });
