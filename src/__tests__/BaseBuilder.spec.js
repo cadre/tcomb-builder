@@ -304,7 +304,7 @@ describe('BaseBuilder', () => {
       context('a provider is provided but a _templateCallback is not', () => {
         it('does not throw', () => {
           const builder = new BaseBuilder()
-            .setLazyTemplateProvider('blah', 'BlahProvider');
+            .setLazyTemplateProvider('blah');
 
           expect(() => builder.getOptions()).to.not.throw();
         });
@@ -331,7 +331,7 @@ describe('BaseBuilder', () => {
           const builder = new BaseBuilder()
             .setField('field2', field2)
             .setField('field3', field3)
-            .setLazyTemplateProvider(lazyTemplateProvider, 'DefaultProvider');
+            .setLazyTemplateProvider(lazyTemplateProvider);
 
           builder.getOptions();
 
@@ -351,7 +351,7 @@ describe('BaseBuilder', () => {
           const builder = new BaseBuilder()
             .setTemplateFactory(factory)
             .setLazyTemplateFactory(provider => provider.setF1(), 'F1')
-            .setLazyTemplateProvider(lazyTemplateProvider, 'DefaultProvider');
+            .setLazyTemplateProvider(lazyTemplateProvider);
 
           const options = builder.getOptions();
           expect(options.factory).to.equal(factory);

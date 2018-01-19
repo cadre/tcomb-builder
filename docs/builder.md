@@ -328,20 +328,17 @@ defined by the type.
 
 **name**: `string`
 
-## `setLazyTemplateProvider(provider, name)`
+## `setLazyTemplateProvider(provider)`
 
 ### Summary
 
 Sets a template provider instance. Set the provider only on the top level
 type, and it will be used to recursively generate templates for all sub-field
-options objects. The `name` parameter is used when checking for builder
-equality.
+options objects.
 
 ### Parameters
 
 **provider**: `LazyTemplateInterface`
-
-**name**: `string`
 
 ## `makeOptional(isOptional = true)`
 

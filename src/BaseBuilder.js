@@ -13,6 +13,10 @@ const initialState = {
   // Used to wrap this builder's type in a maybe to make it optional.
   _isOptional: false,
 
+  // Used to lazily close over the `_lazyTemplateProvider` until the options blob is
+  // realized.
+  _lazyTemplateProvider: null,
+
   // Directly returned from the builder.
   options: Immutable.Map(),
 
@@ -26,12 +30,6 @@ const initialState = {
     // Used to lazily close over the `_lazyTemplateProvider` until the options blob is
     // realized.
     _templateProviderCallback: Immutable.Map({
-      name: null,
-      value: null,
-    }),
-    // Used to recursively provide the template provider to all fields which
-    // define a template in the options object.
-    _lazyTemplateProvider: Immutable.Map({
       name: null,
       value: null,
     }),
@@ -374,11 +372,8 @@ export default class BaseBuilder {
    * used internally to check builder equality
    * @return {BaseBuilder}
    */
-  setLazyTemplateProvider(provider, name) {
-    // .merge() cannot be used here because it coerces provider into a Map.
-    return new this.constructor(this._state
-      .setIn(['builderFunctions', '_lazyTemplateProvider', 'value'], provider)
-      .setIn(['builderFunctions', '_lazyTemplateProvider', 'name'], name));
+  setLazyTemplateProvider(provider) {
+    return new this.constructor(this._state.set('_lazyTemplateProvider', provider));
   }
 
   /**
@@ -568,7 +563,7 @@ export default class BaseBuilder {
       disableTemplates = this._state.get('_disableTemplates', false),
     } = config;
 
-    const provider = lazyTemplateProvider || this._getBuilderFunction('_lazyTemplateProvider');
+    const provider = lazyTemplateProvider || this._state.get('_lazyTemplateProvider');
 
     const unionBuilders = this._state.get('_unionBuilders');
     if (!unionBuilders.isEmpty()) {
