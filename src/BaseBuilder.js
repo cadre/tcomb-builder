@@ -171,6 +171,10 @@ export default class BaseBuilder {
    * @return {BaseBuilder}
    */
   setLazyTemplateFactory(name, callback) {
+    if (!tcomb.validate(name, tcomb.String).isValid()) {
+      throw new Error('First parameter must be a string');
+    }
+
     return new this.constructor(this._state
       .mergeIn(['builderFunctions', '_templateProviderCallback'], {
         name,
@@ -215,6 +219,10 @@ export default class BaseBuilder {
    * @return {BaseBuilder}
    */
   setValidation(name, getValidationErrorMessage) {
+    if (!tcomb.validate(name, tcomb.String).isValid()) {
+      throw new Error('First parameter must be a string');
+    }
+
     return new this.constructor(this._state
       .mergeIn(['builderFunctions', '_getValidationErrorMessage'], {
         name,
@@ -231,6 +239,10 @@ export default class BaseBuilder {
    * @return {BaseBuilder}
    */
   setTransformer(name, transformer) {
+    if (!tcomb.validate(name, tcomb.String).isValid()) {
+      throw new Error('First parameter must be a string');
+    }
+
     return new this.constructor(this._state
       .mergeIn(['optionsFunctions', 'transformer'], {
         name,
@@ -247,6 +259,10 @@ export default class BaseBuilder {
    * @return {BaseBuilder}
    */
   setSort(name, sortComparator) {
+    if (!tcomb.validate(name, tcomb.String).isValid()) {
+      throw new Error('First parameter must be a string');
+    }
+
     return new this.constructor(this._state
       .mergeIn(['configFunctions', 'sortComparator'], {
         name,
@@ -265,6 +281,10 @@ export default class BaseBuilder {
    * @return {BaseBuilder}
    */
   addValidation(name, getValidationErrorMessage) {
+    if (!tcomb.validate(name, tcomb.String).isValid()) {
+      throw new Error('First parameter must be a string');
+    }
+
     const existingFn = this._getBuilderFunction('_getValidationErrorMessage');
     if (!existingFn) {
       return this.setValidation(name, getValidationErrorMessage);
@@ -346,6 +366,10 @@ export default class BaseBuilder {
    * @return {BaseBuilder}
    */
   setType(name, typeCombinator) {
+    if (!tcomb.validate(name, tcomb.String).isValid()) {
+      throw new Error('First parameter must be a string');
+    }
+
     return new this.constructor(this._state
       .mergeIn(['builderFunctions', '_type'], {
         name,
@@ -362,6 +386,10 @@ export default class BaseBuilder {
    * @return {BaseBuilder}
    */
   setTypeAndValidate(name, type) {
+    if (!tcomb.validate(name, tcomb.String).isValid()) {
+      throw new Error('First parameter must be a string');
+    }
+
     return this.setType(name, getValidationErrorMessage => {
       if (!getValidationErrorMessage) {
         throw new Error('You called setTypeAndValidate without setting a '
