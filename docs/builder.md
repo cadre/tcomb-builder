@@ -450,7 +450,17 @@ template callbacks are set, but no template provider is made available.
 
 ### Summary
 
-Test for builder value equality.
+Test for builder value equality. Internally, everything set on the builder is
+compared. Order matters for some methods, for example `setField` and
+`setValidation`, since their order also changes the resulting options and type
+objects.
+
+Methods that take functions as parameters use the key that is also set in that
+function as the point of comparison. If `.setValidation('foo', () => 'foo')`
+is called on one builder and `.setValidation('foo', () => 'bar')` on an
+equivalent builder, the builders will be considered equivalent, despite the
+functions being different. Key names are used instead of function references
+when checking equality because references will change when the page re-renders.
 
 ### Parameters
 

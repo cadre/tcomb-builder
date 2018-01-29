@@ -153,7 +153,7 @@ const crossValidation = validators.combine([
 ]);
 
 const foodGroup = widgets.CheckboxGroupBuilder
-  .setValidation(crossValidation, 'CrossValidation')
+  .setValidation(crossValidation, 'SelectOneOrTwo')
   .setField('bananaStand', bananaStand)
   .setField('chickenDance', chickenDance)
   .setField('hugeMistake', hugeMistake)

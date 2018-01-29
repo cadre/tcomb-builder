@@ -213,8 +213,10 @@ export default class BaseBuilder {
    */
   setValidation(getValidationErrorMessage, name) {
     return new this.constructor(this._state
-      .mergeIn(['builderFunctions', '_getValidationErrorMessage'],
-        { name, value: getValidationErrorMessage }));
+      .mergeIn(['builderFunctions', '_getValidationErrorMessage'], {
+        name,
+        value: getValidationErrorMessage,
+      }));
   }
 
   /**
@@ -263,7 +265,7 @@ export default class BaseBuilder {
       .setIn(['builderFunctions', '_getValidationErrorMessage', 'value'],
         validators.combine([existingFn, getValidationErrorMessage]))
       .updateIn(['builderFunctions', '_getValidationErrorMessage', 'name'],
-        oldName => (!oldName ? oldName : oldName + name)));
+        oldName => (oldName ? `${oldName} ${name}` : name)));
   }
 
   /**
