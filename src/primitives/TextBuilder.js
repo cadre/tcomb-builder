@@ -9,5 +9,5 @@ const validation = validators.combine([
 ]);
 
 export default new BaseBuilder()
-  .setTypeAndValidate(tcomb.String, 'Text')
-  .setValidation(validation, 'LengthValidation');
+  .setTypeAndValidate('Text', tcomb.String)
+  .setValidation('LengthValidation', validation);

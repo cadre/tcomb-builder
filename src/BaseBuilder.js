@@ -164,15 +164,18 @@ export default class BaseBuilder {
    * instance of `LazyTemplateInterface` can be made available to all
    * sub-fields recursively.
    *
-   * @param {callback} callback - Function which takes an instance of
-   * `LazyTemplateInterface` and returns a template provider class
    * @param {string} name - Identifier for the lazy template factory; used
    * internally to check builder equality
+   * @param {callback} callback - Function which takes an instance of
+   * `LazyTemplateInterface` and returns a template provider class
    * @return {BaseBuilder}
    */
-  setLazyTemplateFactory(callback, name) {
+  setLazyTemplateFactory(name, callback) {
     return new this.constructor(this._state
-      .mergeIn(['builderFunctions', '_templateProviderCallback'], { name, value: callback }));
+      .mergeIn(['builderFunctions', '_templateProviderCallback'], {
+        name,
+        value: callback,
+      }));
   }
 
   /**
@@ -206,12 +209,12 @@ export default class BaseBuilder {
    * Set a validation function that will be set on the tcomb type when it is
    * realized. This method will override previously set functions.
    *
-   * @param {function} getValidationErrorMessage
    * @param {string} name - Identifier for the validation function; used
    * internally to check builder equality
+   * @param {function} getValidationErrorMessage
    * @return {BaseBuilder}
    */
-  setValidation(getValidationErrorMessage, name) {
+  setValidation(name, getValidationErrorMessage) {
     return new this.constructor(this._state
       .mergeIn(['builderFunctions', '_getValidationErrorMessage'], {
         name,
@@ -222,27 +225,33 @@ export default class BaseBuilder {
   /**
    * Set the transformer function in the options object for this type.
    *
-   * @param {transformer} transformer
    * @param {string} name - Identifier for the transformer function; used
    * internally to check builder equality
+   * @param {transformer} transformer
    * @return {BaseBuilder}
    */
-  setTransformer(transformer, name) {
+  setTransformer(name, transformer) {
     return new this.constructor(this._state
-      .mergeIn(['optionsFunctions', 'transformer'], { name, value: transformer }));
+      .mergeIn(['optionsFunctions', 'transformer'], {
+        name,
+        value: transformer,
+      }));
   }
 
   /**
    * Set the sort comparator in the config object for this type.
    *
-   * @param {(Any, Any) => Integer} sortComparator
    * @param {string} name - Identifier for the sort function; used internally
    * to check builder equality
+   * @param {(Any, Any) => Integer} sortComparator
    * @return {BaseBuilder}
    */
-  setSort(sortComparator, name) {
+  setSort(name, sortComparator) {
     return new this.constructor(this._state
-      .mergeIn(['configFunctions', 'sortComparator'], { name, value: sortComparator }));
+      .mergeIn(['configFunctions', 'sortComparator'], {
+        name,
+        value: sortComparator,
+      }));
   }
 
   /**
@@ -250,15 +259,15 @@ export default class BaseBuilder {
    * If a function is not already set, then it is equivalent to
    * `setValidation`.
    *
-   * @param {function} getValidationErrorMessage
    * @param {string} name - Identifier for the validation function; used
    * internally to check builder equality
+   * @param {function} getValidationErrorMessage
    * @return {BaseBuilder}
    */
-  addValidation(getValidationErrorMessage, name) {
+  addValidation(name, getValidationErrorMessage) {
     const existingFn = this._getBuilderFunction('_getValidationErrorMessage');
     if (!existingFn) {
-      return this.setValidation(getValidationErrorMessage, name);
+      return this.setValidation(name, getValidationErrorMessage);
     }
 
     return new this.constructor(this._state
@@ -330,28 +339,30 @@ export default class BaseBuilder {
    * ordering of builder commands, wait to realize the type until the `getType`
    * method is called.
    *
-   * @param {typeCombinatorCallback} typeCombinator - set a lazily executed
-   * type on the internal state
    * @param {string} name - Identifier for the type function; used internally
    * to check builder equality
+   * @param {typeCombinatorCallback} typeCombinator - set a lazily executed
+   * type on the internal state
    * @return {BaseBuilder}
    */
-  setType(typeCombinator, name) {
+  setType(name, typeCombinator) {
     return new this.constructor(this._state
-      .mergeIn(['builderFunctions', '_type'],
-        { name, value: (errorFn, subTypes) => typeCombinator(errorFn, subTypes) }));
+      .mergeIn(['builderFunctions', '_type'], {
+        name,
+        value: (errorFn, subTypes) => typeCombinator(errorFn, subTypes),
+      }));
   }
 
   /**
    * Convenience function for setting the type and using the built-in
    * validation defined by the type.
-   * @param {type} type
    * @param {string} name - Identifier for the type function; used internally
    * to check builder equality
+   * @param {type} type
    * @return {BaseBuilder}
    */
-  setTypeAndValidate(type, name) {
-    return this.setType(getValidationErrorMessage => {
+  setTypeAndValidate(name, type) {
+    return this.setType(name, getValidationErrorMessage => {
       if (!getValidationErrorMessage) {
         throw new Error('You called setTypeAndValidate without setting a '
         + 'validationErrorMessageFn');
@@ -361,7 +372,7 @@ export default class BaseBuilder {
         x => !tcomb.String.is(getValidationErrorMessage(x)),
         name,
       );
-    }, name);
+    });
   }
 
   /**
@@ -370,8 +381,6 @@ export default class BaseBuilder {
    * sub-field options objects.
    *
    * @param {LazyTemplateInterface} provider
-   * @param {string} name - Identifier for the lazy template provider function;
-   * used internally to check builder equality
    * @return {BaseBuilder}
    */
   setLazyTemplateProvider(provider) {

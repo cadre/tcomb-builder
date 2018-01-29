@@ -28,7 +28,7 @@ class UnionBuilder extends BaseBuilder {
    *
    * @param {function} dispatch
    */
-  setDispatch(dispatch, name) {
+  setDispatch(name, dispatch) {
     return new this.constructor(this._state
       .mergeIn(['builderFunctions', '_dispatch'], { name, value: dispatch }));
   }

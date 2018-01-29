@@ -19,7 +19,7 @@ import * as validators from './path/to/validators';
 import TextBuilder from './path/to/TextBuilder';
 
 const zipCode = TextBuilder
-  .setValidation(validators.text.length(5), 'LengthValidation');
+  .setValidation('LengthValidation', validators.text.length(5));
 ```
 
 A common need is to perform several different validations on a single field.
@@ -50,7 +50,7 @@ const crossValidation = validators.combine([
 ]);
 
 const foodGroup = widgets.CheckboxGroupBuilder
-    .setValidation(crossValidation, 'CrossValidation')
+    .setValidation('CrossValidation', crossValidation)
     .setField('bananaStand', bananaStand)
     .setField('chickenDance', chickenDance)
     .setField('hugeMistake', hugeMistake)

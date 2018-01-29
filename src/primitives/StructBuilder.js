@@ -16,8 +16,6 @@ class StructBuilder extends BaseBuilder {
 }
 
 export default new StructBuilder()
-  .setValidation(() => null, 'NoValidation')
-  .setType((getValidationErrorMessage, fields) => tcomb.refinement(
-    tcomb.struct(fields), x => !tcomb.String.is(getValidationErrorMessage(x)), 'Struct',
-    'Struct',
-  ));
+  .setValidation('NoValidation', () => null)
+  .setType('Struct', (getValidationErrorMessage, fields) => tcomb.refinement(
+    tcomb.struct(fields), x => !tcomb.String.is(getValidationErrorMessage(x)), 'Struct'));

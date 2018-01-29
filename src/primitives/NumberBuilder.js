@@ -4,5 +4,5 @@ import BaseBuilder from '../BaseBuilder';
 import * as validators from '../validators';
 
 export default new BaseBuilder()
-  .setTypeAndValidate(tcomb.Number, 'Number')
-  .setValidation(validators.number.isNumber, 'NumberValidation');
+  .setTypeAndValidate('Number', tcomb.Number)
+  .setValidation('NumberValidation', validators.number.isNumber);

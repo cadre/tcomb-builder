@@ -3,7 +3,7 @@ import { validators, widgets } from '../index';
 const showName = widgets.TextBuilder.setLabel('Show Name');
 
 const firstEpisodeDate = widgets.TextBuilder
-  .setValidation(validators.date.birthdate, 'BirthdateValidation')
+  .setValidation('BirthdateValidation', validators.date.birthdate)
   .setLabel('Date of Birth');
 
 const genre = widgets.TextBuilder

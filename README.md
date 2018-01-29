@@ -80,8 +80,8 @@ function validation(value) {
 }
 
 const TextBuilder = new BaseBuilder()
-  .setTypeAndValidate(tcomb.String, 'Text')
-  .setValidation(validation, 'LengthValidation');
+  .setTypeAndValidate('Text', tcomb.String)
+  .setValidation('LengthValidation', validation);
 
 const firstName = TextBuilder.setLabel('First Name');
 
@@ -130,7 +130,7 @@ import { primitives, validators, widgets } from 'tcomb-builder';
 const name = widgets.TextBuilder.setLabel('Name');
 
 const dateOfBirth = widgets.TextBuilder
-  .setValidation(validators.date.birthdate, 'BirthdateValidation')
+  .setValidation('BirthdateValidation', validators.date.birthdate)
   .setLabel('Date of Birth');
 
 const occupation = widgets.TextBuilder
@@ -153,7 +153,7 @@ const crossValidation = validators.combine([
 ]);
 
 const foodGroup = widgets.CheckboxGroupBuilder
-  .setValidation(crossValidation, 'SelectOneOrTwo')
+  .setValidation('SelectOneOrTwo', crossValidation)
   .setField('bananaStand', bananaStand)
   .setField('chickenDance', chickenDance)
   .setField('hugeMistake', hugeMistake)

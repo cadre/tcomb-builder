@@ -13,9 +13,9 @@ describe('UnionBuilder', () => {
         .setField('state', TextBuilder);
       const countriesBuilder = UnionBuilder
         .setUnion([international, usa])
-        .setDispatch(value => (
+        .setDispatch('CountryDispatch', value => (
           value.country === 'usa' ? usa : international
-        ), 'CountryDispatch');
+        ));
       const Country = countriesBuilder.getType();
       expect(() => Country({ country: 'usa', state: 'california' })).to.not.throw();
       expect(() => Country({ country: 'usa' })).to.throw();
@@ -30,9 +30,9 @@ describe('UnionBuilder', () => {
         .setField('state', TextBuilder);
       const countriesBuilder = UnionBuilder
         .setUnion([international, usa])
-        .setDispatch(value => (
+        .setDispatch('CountryDispatch', value => (
           value.country === 'usa' ? usa : international
-        ), 'CountryDispatch');
+        ));
       expect(countriesBuilder.getOptions()).to.have.length(2);
     });
 
@@ -47,9 +47,9 @@ describe('UnionBuilder', () => {
         .setField('state', TextBuilder);
       const countriesBuilder = UnionBuilder
         .setUnion([international, usa])
-        .setDispatch(value => (
+        .setDispatch('CountryDispatch', value => (
           value.country === 'usa' ? imposterUsa : international
-        ), 'CountryDispatch');
+        ));
       const Country = countriesBuilder.getType();
       expect(() => Country({ country: 'usa', state: 'california' })).to.throw();
     });
@@ -64,9 +64,9 @@ describe('UnionBuilder', () => {
       const countriesBuilder = UnionBuilder
         ._disableTemplates()
         .setUnion([international, usa])
-        .setDispatch(value => (
+        .setDispatch('CountryDispatch', value => (
           value.country === 'usa' ? usa : international
-        ), 'CountryDispatch');
+        ));
       expect(() => countriesBuilder.getOptions()).to.not.throw();
       expect(countriesBuilder.getOptions()).to.have.length(2);
     });
@@ -87,9 +87,9 @@ describe('UnionBuilder', () => {
         .setField('state', TextBuilder);
       const countriesBuilder = UnionBuilder
         .setUnion([international, usa])
-        .setDispatch(value => (
+        .setDispatch('CountryDispatch', value => (
           value.country === 'usa' ? usa : international
-        ), 'CountryDispatch');
+        ));
 
       const otherInternational = StructBuilder
         .setField('country', TextBuilder);
@@ -98,9 +98,9 @@ describe('UnionBuilder', () => {
         .setField('state', TextBuilder);
       const otherCountriesBuilder = UnionBuilder
         .setUnion([otherInternational, otherUsa])
-        .setDispatch(value => (
+        .setDispatch('CountryDispatch', value => (
           value.country === 'usa' ? otherUsa : otherInternational
-        ), 'CountryDispatch');
+        ));
 
       expect(countriesBuilder.isEqual(otherCountriesBuilder)).to.be.true;
     });
@@ -115,9 +115,9 @@ describe('UnionBuilder', () => {
         .setField('zip', TextBuilder);
       const countriesBuilder = UnionBuilder
         .setUnion([international, usa])
-        .setDispatch(value => (
+        .setDispatch('CountryDispatch', value => (
           value.country === 'usa' ? usa : international
-        ), 'CountryDispatch');
+        ));
 
       // Usa does not have zip.
       const otherInternational = StructBuilder
@@ -127,9 +127,9 @@ describe('UnionBuilder', () => {
         .setField('state', TextBuilder);
       const otherCountriesBuilder = UnionBuilder
         .setUnion([otherInternational, otherUsa])
-        .setDispatch(value => (
+        .setDispatch('CountryDispatch', value => (
           value.country === 'usa' ? otherUsa : otherInternational
-        ), 'CountryDispatch');
+        ));
 
       expect(countriesBuilder.isEqual(otherCountriesBuilder)).to.be.false;
     });

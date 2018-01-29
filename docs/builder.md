@@ -65,7 +65,7 @@ Set what properties should be automatically generated for you.  Options are:
 
 **text**: `string`
 
-## `setTransformer(transformer, name)`
+## `setTransformer(name, transformer)`
 
 ### Summary
 
@@ -76,9 +76,9 @@ out. The `name` parameter is used when checking for builder equality.
 
 ### Parameters
 
-**transformer**: `object` transformer
-
 **name**: `string`
+
+**transformer**: `object` transformer
 
 ## `setHelp(help)`
 
@@ -112,7 +112,7 @@ template factory using this method will supersede the lazy one.
 
 **factory**: `TemplateFactory`
 
-## `setLazyTemplateFactory(callback, name)`
+## `setLazyTemplateFactory(name, callback)`
 
 ### Summary
 
@@ -123,13 +123,13 @@ The `name` parameter is used when checking for builder equality.
 
 ### Example
 
-`.setLazyTemplateFactory(provider => provider.getTextField(), 'TextField')`
+`.setLazyTemplateFactory('TextField', provider => provider.getTextField())`
 
 ### Parameters
 
-**factory**: `LazyTemplateInterface => TemplateFactory`
-
 **name**: `string`
+
+**factory**: `LazyTemplateInterface => TemplateFactory`
 
 ## `setError(error)`
 
@@ -181,7 +181,7 @@ const field = new BaseBuilder()
 
 **hasError**: `boolean`
 
-## `setValidation(getValidationErrorMessage, name)`
+## `setValidation(name, getValidationErrorMessage)`
 
 ### Summary
 
@@ -198,16 +198,16 @@ function getValidationErrorMessage(value) {
 }
 
 const field = new BaseBuilder()
-    .setValidation(getValidationErrorMessage, 'BooleanValidation');
+    .setValidation('BooleanValidation', getValidationErrorMessage);
 ```
 
 ### Parameters
 
-**getValidationErrorMessage**: `(value, path, context) => ?(string | ReactElement)`
-
 **name**: `string`
 
-## `addValidation(getValidationErrorMessage, name)`
+**getValidationErrorMessage**: `(value, path, context) => ?(string | ReactElement)`
+
+## `addValidation(name, getValidationErrorMessage)`
 
 ### Summary
 
@@ -228,15 +228,15 @@ function truthyValidation(value) {
 }
 
 const field = new BaseBuilder()
-    .setValidation(booleanValidation, 'BooleanValidation')
-    .addValidation(truthyValidation, 'TruthyValidation');
+    .setValidation('BooleanValidation', booleanValidation)
+    .addValidation('TruthyValidation', truthyValidation);
 ```
 
 ### Parameters
 
-**getValidationErrorMessage**: `(value, path, context) => ?(string | ReactElement)`
-
 **name**: `string`
+
+**getValidationErrorMessage**: `(value, path, context) => ?(string | ReactElement)`
 
 ## `setField(key, fieldBuilder)`
 
@@ -289,14 +289,14 @@ const noBuilder = new BaseBuilder()
 export default RadioBuilder
     .addSelectOption(yesBuilder)
     .addSelectOption(noBuilder)
-    .setTypeAndValidate(tcomb.enums.of([true, false]), 'YesNoBuilder');
+    .setTypeAndValidate('YesNoBuilder', tcomb.enums.of([true, false]));
 ```
 
 ### Parameters
 
 **selectBuilder**: `BaseBuilder`
 
-## `setType(typeCombinator, name)`
+## `setType(name, typeCombinator)`
 
 ### Summary
 
@@ -311,11 +311,11 @@ See the [`StructBuilder`](../src/primitives/StructBuilder.js)
 
 ### Parameters
 
-**typeCombinator**: `(errorFn: (value: string) => boolean, subTypes: Object) => TcombType`
-
 **name**: `string`
 
-## `setTypeAndValidate(type, name)`
+**typeCombinator**: `(errorFn: (value: string) => boolean, subTypes: Object) => TcombType`
+
+## `setTypeAndValidate(name, type)`
 
 ### Summary
 
@@ -324,9 +324,9 @@ defined by the type.
 
 ### Parameters
 
-**type**: `TcombType`
-
 **name**: `string`
+
+**type**: `TcombType`
 
 ## `setLazyTemplateProvider(provider)`
 
@@ -424,7 +424,7 @@ for telling the template how much padding to put around the component.
 
 **rhythm**: `string`
 
-## `setSort(sortComparator, name)`
+## `setSort(name, sortComparator)`
 
 ### Summary
 
@@ -434,9 +434,9 @@ parameter is used when checking for builder equality.
 
 ### Parameters
 
-**order**: `(a, b) => number`
-
 **name**: `string`
+
+**order**: `(a, b) => number`
 
 ## `_disableTemplates()`
 
