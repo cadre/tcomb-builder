@@ -58,23 +58,25 @@ display value in select and radio groups.
 
 ### Summary
 
-Set what properties should be automatically generated for you.
-Options are: 'labels', 'placeholders', 'none'.
+Set what properties should be automatically generated for you.  Options are:
+'labels', 'placeholders', 'none'.
 
 ### Parameters
 
 **text**: `string`
 
-## `setTransformer(transformer)`
+## `setTransformer(name, transformer)`
 
 ### Summary
 
 Set the transformer object in the options object for this type. The transformer
 object has two keys: `parse` and `format`. `parse` is a function describing how
 values will be transformed going into the type; `format` describes how they come
-out.
+out. The `name` parameter is used when checking for builder equality.
 
 ### Parameters
+
+**name**: `string`
 
 **transformer**: `object` transformer
 
@@ -110,19 +112,22 @@ template factory using this method will supersede the lazy one.
 
 **factory**: `TemplateFactory`
 
-## `setLazyTemplateFactory(callback)`
+## `setLazyTemplateFactory(name, callback)`
 
 ### Summary
 
 Set a template provider for this field in its options object. Because the
 provider is accessed at builder evaluation time, it is necessary to set the
 factory by passing a callback function to the `setLazyTemplateFactory` method.
+The `name` parameter is used when checking for builder equality.
 
 ### Example
 
-`.setLazyTemplateFactory(provider => provider.getTextField())`
+`.setLazyTemplateFactory('TextField', provider => provider.getTextField())`
 
 ### Parameters
+
+**name**: `string`
 
 **factory**: `LazyTemplateInterface => TemplateFactory`
 
@@ -176,14 +181,14 @@ const field = new BaseBuilder()
 
 **hasError**: `boolean`
 
-## `setValidation(getValidationErrorMessage)`
+## `setValidation(name, getValidationErrorMessage)`
 
 ### Summary
 
 Set a validation function for this field as a static function on its type. The
 validation function must conform to the same spec as that in `tcomb-validation`
 where it returns `null` if there is no error, and a `string` if an error
-occurred.
+occurred. The `name` parameter is used when checking for builder equality.
 
 ### Example
 
@@ -193,20 +198,23 @@ function getValidationErrorMessage(value) {
 }
 
 const field = new BaseBuilder()
-    .setValidation(getValidationErrorMessage);
+    .setValidation('BooleanValidation', getValidationErrorMessage);
 ```
 
 ### Parameters
 
+**name**: `string`
+
 **getValidationErrorMessage**: `(value, path, context) => ?(string | ReactElement)`
 
-## `addValidation(getValidationErrorMessage)`
+## `addValidation(name, getValidationErrorMessage)`
 
 ### Summary
 
 Adds a validation function to the existing function in the options object for
 this type. If there is no existing validation function, then it is equivalent
-to `setValidation`.
+to `setValidation`. The `name` parameter is used when checking for builder
+equality.
 
 ### Example
 
@@ -220,11 +228,13 @@ function truthyValidation(value) {
 }
 
 const field = new BaseBuilder()
-    .setValidation(booleanValidation)
-    .addValidation(truthyValidation);
+    .setValidation('BooleanValidation', booleanValidation)
+    .addValidation('TruthyValidation', truthyValidation);
 ```
 
 ### Parameters
+
+**name**: `string`
 
 **getValidationErrorMessage**: `(value, path, context) => ?(string | ReactElement)`
 
@@ -279,21 +289,21 @@ const noBuilder = new BaseBuilder()
 export default RadioBuilder
     .addSelectOption(yesBuilder)
     .addSelectOption(noBuilder)
-    .setTypeAndValidate(tcomb.enums.of([true, false]));
+    .setTypeAndValidate('YesNoBuilder', tcomb.enums.of([true, false]));
 ```
 
 ### Parameters
 
 **selectBuilder**: `BaseBuilder`
 
-## `setType(typeCombinator)`
+## `setType(name, typeCombinator)`
 
 ### Summary
 
 Set the tcomb type of this builder. The type must be passed in as a callback
 function in order to allow for arbitrary ordering of builder commands. The
 validation function and fields are provided to you when you are creating the
-type.
+type. The `name` parameter is used when checking for builder equality.
 
 ### Example
 
@@ -301,9 +311,11 @@ See the [`StructBuilder`](../src/primitives/StructBuilder.js)
 
 ### Parameters
 
+**name**: `string`
+
 **typeCombinator**: `(errorFn: (value: string) => boolean, subTypes: Object) => TcombType`
 
-## `setTypeAndValidate(type, name)`
+## `setTypeAndValidate(name, type)`
 
 ### Summary
 
@@ -312,17 +324,17 @@ defined by the type.
 
 ### Parameters
 
-**type**: `TcombType`
-
 **name**: `string`
+
+**type**: `TcombType`
 
 ## `setLazyTemplateProvider(provider)`
 
 ### Summary
 
 Sets a template provider instance. Set the provider only on the top level
-type, and it will be used to recursively generate templates for all
-sub-field options objects.
+type, and it will be used to recursively generate templates for all sub-field
+options objects.
 
 ### Parameters
 
@@ -412,14 +424,17 @@ for telling the template how much padding to put around the component.
 
 **rhythm**: `string`
 
-## `setSort(sortComparator)`
+## `setSort(name, sortComparator)`
 
 ### Summary
 
 Set the sort function in the config object for this type. This function will be
-used to tell the template how to sort the values in the enum.
+used to tell the template how to sort the values in the enum. The `name`
+parameter is used when checking for builder equality.
 
 ### Parameters
+
+**name**: `string`
 
 **order**: `(a, b) => number`
 
@@ -430,6 +445,26 @@ used to tell the template how to sort the values in the enum.
 Disable template realization for this builder and any fields that it contains.
 This method is intended to be used only in unit tests for surveys where
 template callbacks are set, but no template provider is made available.
+
+## `isEqual()`
+
+### Summary
+
+Test for builder value equality. Internally, everything set on the builder is
+compared. Order matters for some methods, for example `setField` and
+`setValidation`, since their order also changes the resulting options and type
+objects.
+
+Methods that take functions as parameters use the key that is also set in that
+function as the point of comparison. If `.setValidation('foo', () => 'foo')`
+is called on one builder and `.setValidation('foo', () => 'bar')` on an
+equivalent builder, the builders will be considered equivalent, despite the
+functions being different. Key names are used instead of function references
+when checking equality because references will change when the page re-renders.
+
+### Parameters
+
+**other**: `BaseBuilder`
 
 ## `getType()`
 

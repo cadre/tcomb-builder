@@ -13,7 +13,7 @@ describe('UnionBuilder', () => {
         .setField('state', TextBuilder);
       const countriesBuilder = UnionBuilder
         .setUnion([international, usa])
-        .setDispatch(value => (
+        .setDispatch('CountryDispatch', value => (
           value.country === 'usa' ? usa : international
         ));
       const Country = countriesBuilder.getType();
@@ -30,7 +30,7 @@ describe('UnionBuilder', () => {
         .setField('state', TextBuilder);
       const countriesBuilder = UnionBuilder
         .setUnion([international, usa])
-        .setDispatch(value => (
+        .setDispatch('CountryDispatch', value => (
           value.country === 'usa' ? usa : international
         ));
       expect(countriesBuilder.getOptions()).to.have.length(2);
@@ -47,7 +47,7 @@ describe('UnionBuilder', () => {
         .setField('state', TextBuilder);
       const countriesBuilder = UnionBuilder
         .setUnion([international, usa])
-        .setDispatch(value => (
+        .setDispatch('CountryDispatch', value => (
           value.country === 'usa' ? imposterUsa : international
         ));
       const Country = countriesBuilder.getType();
@@ -64,7 +64,7 @@ describe('UnionBuilder', () => {
       const countriesBuilder = UnionBuilder
         ._disableTemplates()
         .setUnion([international, usa])
-        .setDispatch(value => (
+        .setDispatch('CountryDispatch', value => (
           value.country === 'usa' ? usa : international
         ));
       expect(() => countriesBuilder.getOptions()).to.not.throw();
@@ -75,6 +75,63 @@ describe('UnionBuilder', () => {
   describe('setField', () => {
     it('should throw', () => {
       expect(() => UnionBuilder.setField(TextBuilder)).to.throw();
+    });
+  });
+
+  describe('isEqual', () => {
+    it('returns true if all unions are equal', () => {
+      const international = StructBuilder
+        .setField('country', TextBuilder);
+      const usa = StructBuilder
+        .setField('country', TextBuilder)
+        .setField('state', TextBuilder);
+      const countriesBuilder = UnionBuilder
+        .setUnion([international, usa])
+        .setDispatch('CountryDispatch', value => (
+          value.country === 'usa' ? usa : international
+        ));
+
+      const otherInternational = StructBuilder
+        .setField('country', TextBuilder);
+      const otherUsa = StructBuilder
+        .setField('country', TextBuilder)
+        .setField('state', TextBuilder);
+      const otherCountriesBuilder = UnionBuilder
+        .setUnion([otherInternational, otherUsa])
+        .setDispatch('CountryDispatch', value => (
+          value.country === 'usa' ? otherUsa : otherInternational
+        ));
+
+      expect(countriesBuilder.isEqual(otherCountriesBuilder)).to.be.true;
+    });
+
+    it('returns false if any unions are not equal', () => {
+      // Usa has zip.
+      const international = StructBuilder
+        .setField('country', TextBuilder);
+      const usa = StructBuilder
+        .setField('country', TextBuilder)
+        .setField('state', TextBuilder)
+        .setField('zip', TextBuilder);
+      const countriesBuilder = UnionBuilder
+        .setUnion([international, usa])
+        .setDispatch('CountryDispatch', value => (
+          value.country === 'usa' ? usa : international
+        ));
+
+      // Usa does not have zip.
+      const otherInternational = StructBuilder
+        .setField('country', TextBuilder);
+      const otherUsa = StructBuilder
+        .setField('country', TextBuilder)
+        .setField('state', TextBuilder);
+      const otherCountriesBuilder = UnionBuilder
+        .setUnion([otherInternational, otherUsa])
+        .setDispatch('CountryDispatch', value => (
+          value.country === 'usa' ? otherUsa : otherInternational
+        ));
+
+      expect(countriesBuilder.isEqual(otherCountriesBuilder)).to.be.false;
     });
   });
 });

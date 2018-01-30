@@ -9,5 +9,5 @@ const numberTransformer = {
 };
 
 export default NumberBuilder
-  .setTransformer(numberTransformer)
-  .setLazyTemplateFactory(provider => provider.getTextField());
+  .setTransformer('NumberTransformer', numberTransformer)
+  .setLazyTemplateFactory('TextField', provider => provider.getTextField());

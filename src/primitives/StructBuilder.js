@@ -1,7 +1,6 @@
 import tcomb from 'tcomb-validation';
 
 import BaseBuilder from '../BaseBuilder';
-import { validation } from '../combinators';
 
 
 class StructBuilder extends BaseBuilder {
@@ -17,5 +16,6 @@ class StructBuilder extends BaseBuilder {
 }
 
 export default new StructBuilder()
-  .setValidation(() => null)
-  .setType((errorFn, fields) => validation(tcomb.struct(fields), errorFn, 'Struct'));
+  .setValidation('NoValidation', () => null)
+  .setType('Struct', (getValidationErrorMessage, fields) => tcomb.refinement(
+    tcomb.struct(fields), x => !tcomb.String.is(getValidationErrorMessage(x)), 'Struct'));

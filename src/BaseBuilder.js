@@ -1,41 +1,70 @@
 import Immutable from 'immutable';
 import tcomb from 'tcomb-validation';
 
-import { validation } from './combinators';
 import * as validators from './validators';
+
+const NamedFunction = Immutable.Record({
+  name: null,
+  value: null,
+});
+
+class ChainedNamedFunction extends NamedFunction {
+  /**
+   * Append function names when named functions are chained.
+   */
+  addName(name) {
+    const oldName = this.get('name');
+    return this.set('name', oldName ? `${oldName} ${name}` : name);
+  }
+}
 
 const initialState = {
   // Used to internally set fields which will later be realized into type and
   // options objects.
   _fieldBuilders: Immutable.Map(),
 
+  _unionBuilders: Immutable.List(),
+
   // Used to wrap this builder's type in a maybe to make it optional.
   _isOptional: false,
 
-  // Used to keep track of validation functions; when the builder is realized,
-  // it's added as a static function on the type.
-  _getValidationErrorMessage: null,
-
   // Used to lazily close over the `_lazyTemplateProvider` until the options blob is
   // realized.
-  _templateProviderCallback: null,
-
-  // Used to recursively provide the template provider to all fields which
-  // define a template in the options object.
   _lazyTemplateProvider: null,
-
-  // Used to lazily set the type internally in the builder.
-  _type: null,
 
   // Directly returned from the builder.
   options: Immutable.Map(),
 
-  _unionBuilders: Immutable.List(),
+  builderFunctions: Immutable.Map({
+    // Used to keep track of validation functions; when the builder is realized,
+    // it's added as a static function on the type.
+    _getValidationErrorMessage: new ChainedNamedFunction(),
+    // Used to lazily close over the `_lazyTemplateProvider` until the options blob is
+    // realized.
+    _templateProviderCallback: new NamedFunction(),
+    // Used to lazily set the type internally in the builder.
+    _type: new NamedFunction(),
+    // Used to keep track of a union's dispatch function until the builder is
+    // realized.
+    _dispatch: new NamedFunction(),
+  }),
+
+  optionsFunctions: Immutable.Map({
+    transformer: new NamedFunction(),
+  }),
+
+  configFunctions: Immutable.Map({
+    sortComparator: new NamedFunction(),
+  }),
 };
 
 export default class BaseBuilder {
   constructor(state = Immutable.Map(initialState)) {
     this._state = state;
+  }
+
+  _getBuilderFunction(id) {
+    return this._state.getIn(['builderFunctions', id, 'value'], null);
   }
 
   /**
@@ -132,12 +161,22 @@ export default class BaseBuilder {
    * instance of `LazyTemplateInterface` can be made available to all
    * sub-fields recursively.
    *
+   * @param {string} name - Identifier for the lazy template factory; used
+   * internally to check builder equality
    * @param {callback} callback - Function which takes an instance of
    * `LazyTemplateInterface` and returns a template provider class
    * @return {BaseBuilder}
    */
-  setLazyTemplateFactory(callback) {
-    return new this.constructor(this._state.set('_templateProviderCallback', callback));
+  setLazyTemplateFactory(name, callback) {
+    if (!tcomb.validate(name, tcomb.String).isValid()) {
+      throw new Error('First parameter must be a string');
+    }
+
+    return new this.constructor(this._state
+      .mergeIn(['builderFunctions', '_templateProviderCallback'], {
+        name,
+        value: callback,
+      }));
   }
 
   /**
@@ -171,34 +210,21 @@ export default class BaseBuilder {
    * Set a validation function that will be set on the tcomb type when it is
    * realized. This method will override previously set functions.
    *
+   * @param {string} name - Identifier for the validation function; used
+   * internally to check builder equality
    * @param {function} getValidationErrorMessage
    * @return {BaseBuilder}
    */
-  setValidation(getValidationErrorMessage) {
-    return new this.constructor(this._state.set(
-      '_getValidationErrorMessage',
-      getValidationErrorMessage,
-    ));
-  }
+  setValidation(name, getValidationErrorMessage) {
+    if (!tcomb.validate(name, tcomb.String).isValid()) {
+      throw new Error('First parameter must be a string');
+    }
 
-  /**
-   * Set the transformer function in the options object for this type.
-   *
-   * @param {transformer} transformer
-   * @return {BaseBuilder}
-   */
-  setTransformer(transformer) {
-    return new this.constructor(this._state.mergeDeep({ options: { transformer } }));
-  }
-
-  /**
-   * Set the sort comparator in the config object for this type.
-   *
-   * @param {(Any, Any) => Integer} sortComparator
-   * @return {BaseBuilder}
-   */
-  setSort(sortComparator) {
-    return this.setConfig({ sortComparator });
+    return new this.constructor(this._state
+      .mergeIn(['builderFunctions', '_getValidationErrorMessage'], {
+        name,
+        value: getValidationErrorMessage,
+      }));
   }
 
   /**
@@ -206,19 +232,66 @@ export default class BaseBuilder {
    * If a function is not already set, then it is equivalent to
    * `setValidation`.
    *
+   * @param {string} name - Identifier for the validation function; used
+   * internally to check builder equality
    * @param {function} getValidationErrorMessage
    * @return {BaseBuilder}
    */
-  addValidation(getValidationErrorMessage) {
-    const existingFn = this._state.get('_getValidationErrorMessage', null);
-    if (!existingFn) {
-      return this.setValidation(getValidationErrorMessage);
+  addValidation(name, getValidationErrorMessage) {
+    if (!tcomb.validate(name, tcomb.String).isValid()) {
+      throw new Error('First parameter must be a string');
     }
 
-    return new this.constructor(this._state.set(
-      '_getValidationErrorMessage',
-      validators.combine([existingFn, getValidationErrorMessage]),
-    ));
+    const existingFn = this._getBuilderFunction('_getValidationErrorMessage');
+    if (!existingFn) {
+      return this.setValidation(name, getValidationErrorMessage);
+    }
+
+    return new this.constructor(this._state
+      .setIn(['builderFunctions', '_getValidationErrorMessage', 'value'],
+        validators.combine([existingFn, getValidationErrorMessage]))
+      .updateIn(['builderFunctions', '_getValidationErrorMessage'],
+        validation => validation.addName(name)));
+  }
+
+  /**
+   * Set the transformer function in the options object for this type.
+   *
+   * @param {string} name - Identifier for the transformer function; used
+   * internally to check builder equality
+   * @param {transformer} transformer
+   * @return {BaseBuilder}
+   */
+  setTransformer(name, transformer) {
+    if (!tcomb.validate(name, tcomb.String).isValid()) {
+      throw new Error('First parameter must be a string');
+    }
+
+    return new this.constructor(this._state
+      .mergeIn(['optionsFunctions', 'transformer'], {
+        name,
+        value: transformer,
+      }));
+  }
+
+  /**
+   * Set the sort comparator in the config object for this type.
+   *
+   * @param {string} name - Identifier for the sort function; used internally
+   * to check builder equality
+   * @param {(Any, Any) => Integer} sortComparator
+   * @return {BaseBuilder}
+   */
+  setSort(name, sortComparator) {
+    if (!tcomb.validate(name, tcomb.String).isValid()) {
+      throw new Error('First parameter must be a string');
+    }
+
+    return new this.constructor(this._state
+      .mergeIn(['configFunctions', 'sortComparator'], {
+        name,
+        value: sortComparator,
+      }));
   }
 
   /**
@@ -283,31 +356,47 @@ export default class BaseBuilder {
    * ordering of builder commands, wait to realize the type until the `getType`
    * method is called.
    *
+   * @param {string} name - Identifier for the type function; used internally
+   * to check builder equality
    * @param {typeCombinatorCallback} typeCombinator - set a lazily executed
    * type on the internal state
    * @return {BaseBuilder}
    */
-  setType(typeCombinator) {
-    return new this.constructor(this._state.set(
-      '_type',
-      (error, subTypes) => typeCombinator(error, subTypes),
-    ));
+  setType(name, typeCombinator) {
+    if (!tcomb.validate(name, tcomb.String).isValid()) {
+      throw new Error('First parameter must be a string');
+    }
+
+    return new this.constructor(this._state
+      .mergeIn(['builderFunctions', '_type'], {
+        name,
+        value: (errorFn, subTypes) => typeCombinator(errorFn, subTypes),
+      }));
   }
 
   /**
    * Convenience function for setting the type and using the built-in
    * validation defined by the type.
-   * @param {type}
-   * type on the internal state
+   * @param {string} name - Identifier for the type function; used internally
+   * to check builder equality
+   * @param {type} type
    * @return {BaseBuilder}
    */
-  setTypeAndValidate(type, name) {
-    return this.setType(errorFn => {
-      if (!errorFn) {
+  setTypeAndValidate(name, type) {
+    if (!tcomb.validate(name, tcomb.String).isValid()) {
+      throw new Error('First parameter must be a string');
+    }
+
+    return this.setType(name, getValidationErrorMessage => {
+      if (!getValidationErrorMessage) {
         throw new Error('You called setTypeAndValidate without setting a '
         + 'validationErrorMessageFn');
       }
-      return validation(type, errorFn, name);
+      return tcomb.refinement(
+        type,
+        x => !tcomb.String.is(getValidationErrorMessage(x)),
+        name,
+      );
     });
   }
 
@@ -407,6 +496,39 @@ export default class BaseBuilder {
   }
 
   /**
+   * Test for builder value equality.
+   *
+   * @param {BaseBuilder} other
+   * @return {boolean}
+   */
+  isEqual(other) {
+    if (!other) {
+      return false;
+    }
+
+    if (other === this) {
+      return true;
+    }
+
+    const equalFields = this._state.get('_fieldBuilders').every((field, key) =>
+      field.isEqual(other._state.getIn(['_fieldBuilders', key])));
+
+    const equalUnions = this._state.get('_unionBuilders').every((field, i) =>
+      field.isEqual(other._state.getIn(['_unionBuilders', i])));
+
+    const equalFunctions = ['builderFunctions', 'optionsFunctions', 'configFunctions']
+      .map(type => this._state.get(type)
+        .every((value, key) => value.get('name') === other._state.getIn([type, key, 'name'])))
+      .every(value => value);
+
+    return equalFields
+      && equalUnions
+      && equalFunctions
+      && this._state.get('_isOptional') === other._state.get('_isOptional')
+      && this._state.get('options').equals(other._state.get('options'));
+  }
+
+  /**
    * Return a realized type. Lazily realize the type so that the most recent
    * versions of the `error` function and `_fieldBuilders` object are
    * available.
@@ -416,7 +538,8 @@ export default class BaseBuilder {
   getType() {
     const type = () => {
       if (!this._state.get('_unionBuilders').isEmpty()) {
-        if (!this._state.has('_dispatch')) {
+        const dispatch = this._getBuilderFunction('_dispatch');
+        if (!dispatch) {
           throw new Error('No dispatch function found for union type');
         }
 
@@ -428,7 +551,7 @@ export default class BaseBuilder {
         // When setting a dispatch function on the builder, return a builder.
         // Here, take that builder and convert it into a type.
         union.dispatch = value => {
-          const dispatchedBuilder = this._state.get('_dispatch')(value);
+          const dispatchedBuilder = dispatch(value);
           const typeIndex = unionBuilders.indexOf(dispatchedBuilder);
           if (typeIndex === -1) {
             throw new Error('Dispatched builder was not found within the union set');
@@ -438,7 +561,7 @@ export default class BaseBuilder {
         return union;
       }
 
-      const Type = this._state.get('_type');
+      const Type = this._getBuilderFunction('_type');
       if (!Type) {
         throw new Error('No type was set for the current builder');
       }
@@ -452,7 +575,7 @@ export default class BaseBuilder {
         return acc.set(key, field.getType());
       }, Immutable.Map()).toJS();
 
-      const getValidationErrorMessage = this._state.get('_getValidationErrorMessage');
+      const getValidationErrorMessage = this._getBuilderFunction('_getValidationErrorMessage');
       const typeInstance = Type(
         getValidationErrorMessage,
         subTypes,
@@ -485,33 +608,38 @@ export default class BaseBuilder {
     }
 
     const hasConcreteTemplateFactory = this._state.hasIn(['options', 'factory']);
+    const templateProviderCallback = this._getBuilderFunction('_templateProviderCallback');
 
     if (!hasConcreteTemplateFactory
-        && this._state.get('_templateProviderCallback')
+        && templateProviderCallback
         && !provider
         && !disableTemplates) {
       throw new Error('A template callback function was specified, but no provider was set');
     }
 
     // Recursively build up the options object from every field.
-    const fields = this._state.get('_fieldBuilders').entrySeq().reduce((acc, entry) => {
-      const key = entry[0];
-      const field = entry[1];
-
-      return acc.setIn(['options', 'fields', key],
-        field.getOptions(provider, { disableTemplates }));
-    }, Immutable.Map()).toJS();
+    const fields = this._state.get('_fieldBuilders').reduce((acc, field, key) => (
+      acc.setIn(['options', 'fields', key], field.getOptions(provider, { disableTemplates }))
+    ), Immutable.Map()).toJS();
 
     // If a template callback exists, realize the template, merge any
     // sub-fields, and return the resulting options object.
-    const templateProviderCallback = this._state.get('_templateProviderCallback');
     const options = !hasConcreteTemplateFactory && templateProviderCallback && !disableTemplates
       ? this._state.mergeDeep({ options: { factory: templateProviderCallback(provider) } })
       : this._state;
 
+    const flattenFunctions = functions => functions
+      .filter(value => !!value.get('name'))
+      .reduce((acc, value, key) => acc.set(key, value.get('value')), Immutable.Map());
+
+    const optionsFunctions = flattenFunctions(this._state.get('optionsFunctions'));
+    const configFunctions = flattenFunctions(this._state.get('configFunctions'));
+
     return options
       .mergeDeep(fields)
       .get('options')
+      .merge(optionsFunctions)
+      .mergeIn(['config'], configFunctions)
       .toJS();
   }
 }

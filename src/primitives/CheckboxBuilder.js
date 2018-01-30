@@ -4,5 +4,5 @@ import BaseBuilder from '../BaseBuilder';
 import * as validators from '../validators';
 
 export default new BaseBuilder()
-  .setValidation(validators.checkbox.isBoolean)
-  .setTypeAndValidate(tcomb.Boolean, 'Checkbox');
+  .setValidation('BooleanValidation', validators.checkbox.isBoolean)
+  .setTypeAndValidate('Checkbox', tcomb.Boolean);

@@ -7,7 +7,7 @@ const b = CheckboxBuilder.setLabel('b');
 const c = CheckboxBuilder.setLabel('c');
 
 const checkboxGroupBuilder = CheckboxGroupBuilder
-  .setValidation(validators.checkbox.minMax({ min: 0, max: 2 }))
+  .setValidation('MinMaxValidation', validators.checkbox.minMax({ min: 0, max: 2 }))
   .setField('a', a)
   .setField('b', b)
   .setField('c', c);
@@ -15,7 +15,7 @@ const checkboxGroupBuilder = CheckboxGroupBuilder
 describe('CheckboxGroupBuilder', () => {
   it('produces a tcomb Struct that validates correctly', () => {
     const CheckboxGroupType = checkboxGroupBuilder
-      .setValidation(validators.checkbox.minMax({ min: 0, max: 3 }))
+      .setValidation('MinMaxValidation', validators.checkbox.minMax({ min: 0, max: 3 }))
       .getType();
     const CheckboxType = CheckboxBuilder.getType();
     const selections = {
@@ -29,7 +29,7 @@ describe('CheckboxGroupBuilder', () => {
 
   it('produces an error message if number of selected values is less than the min', () => {
     const builder = checkboxGroupBuilder
-      .setValidation(validators.checkbox.minMax({ min: 1, max: 1 }));
+      .setValidation('MinMaxValidation', validators.checkbox.minMax({ min: 1, max: 1 }));
 
     const CheckboxGroupType = builder.getType();
 
@@ -42,7 +42,7 @@ describe('CheckboxGroupBuilder', () => {
 
   it('produces an error message if number of selected values more than the max', () => {
     const builder = checkboxGroupBuilder
-      .setValidation(validators.checkbox.minMax({ min: 1, max: 1 }));
+      .setValidation('MinMaxValidation', validators.checkbox.minMax({ min: 1, max: 1 }));
 
     const CheckboxGroupType = builder.getType();
 
