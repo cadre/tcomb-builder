@@ -3,6 +3,21 @@ import tcomb from 'tcomb-validation';
 
 import * as validators from './validators';
 
+const NamedFunction = Immutable.Record({
+  name: null,
+  value: null,
+});
+
+class ChainedNamedFunction extends NamedFunction {
+  /**
+   * Append function names when named functions are chained.
+   */
+  addName(name) {
+    const oldName = this.get('name');
+    return this.set('name', oldName ? `${oldName} ${name}` : name);
+  }
+}
+
 const initialState = {
   // Used to internally set fields which will later be realized into type and
   // options objects.
@@ -23,41 +38,23 @@ const initialState = {
   builderFunctions: Immutable.Map({
     // Used to keep track of validation functions; when the builder is realized,
     // it's added as a static function on the type.
-    _getValidationErrorMessage: Immutable.Map({
-      name: null,
-      value: null,
-    }),
+    _getValidationErrorMessage: new ChainedNamedFunction(),
     // Used to lazily close over the `_lazyTemplateProvider` until the options blob is
     // realized.
-    _templateProviderCallback: Immutable.Map({
-      name: null,
-      value: null,
-    }),
+    _templateProviderCallback: new NamedFunction(),
     // Used to lazily set the type internally in the builder.
-    _type: Immutable.Map({
-      name: null,
-      value: null,
-    }),
+    _type: new NamedFunction(),
     // Used to keep track of a union's dispatch function until the builder is
     // realized.
-    _dispatch: Immutable.Map({
-      name: null,
-      value: null,
-    }),
+    _dispatch: new NamedFunction(),
   }),
 
   optionsFunctions: Immutable.Map({
-    transformer: Immutable.Map({
-      name: null,
-      value: null,
-    }),
+    transformer: new NamedFunction(),
   }),
 
   configFunctions: Immutable.Map({
-    sortComparator: Immutable.Map({
-      name: null,
-      value: null,
-    }),
+    sortComparator: new NamedFunction(),
   }),
 };
 
@@ -231,6 +228,33 @@ export default class BaseBuilder {
   }
 
   /**
+   * Add an error message function to the existing function on this builder.
+   * If a function is not already set, then it is equivalent to
+   * `setValidation`.
+   *
+   * @param {string} name - Identifier for the validation function; used
+   * internally to check builder equality
+   * @param {function} getValidationErrorMessage
+   * @return {BaseBuilder}
+   */
+  addValidation(name, getValidationErrorMessage) {
+    if (!tcomb.validate(name, tcomb.String).isValid()) {
+      throw new Error('First parameter must be a string');
+    }
+
+    const existingFn = this._getBuilderFunction('_getValidationErrorMessage');
+    if (!existingFn) {
+      return this.setValidation(name, getValidationErrorMessage);
+    }
+
+    return new this.constructor(this._state
+      .setIn(['builderFunctions', '_getValidationErrorMessage', 'value'],
+        validators.combine([existingFn, getValidationErrorMessage]))
+      .updateIn(['builderFunctions', '_getValidationErrorMessage'],
+        validation => validation.addName(name)));
+  }
+
+  /**
    * Set the transformer function in the options object for this type.
    *
    * @param {string} name - Identifier for the transformer function; used
@@ -268,33 +292,6 @@ export default class BaseBuilder {
         name,
         value: sortComparator,
       }));
-  }
-
-  /**
-   * Add an error message function to the existing function on this builder.
-   * If a function is not already set, then it is equivalent to
-   * `setValidation`.
-   *
-   * @param {string} name - Identifier for the validation function; used
-   * internally to check builder equality
-   * @param {function} getValidationErrorMessage
-   * @return {BaseBuilder}
-   */
-  addValidation(name, getValidationErrorMessage) {
-    if (!tcomb.validate(name, tcomb.String).isValid()) {
-      throw new Error('First parameter must be a string');
-    }
-
-    const existingFn = this._getBuilderFunction('_getValidationErrorMessage');
-    if (!existingFn) {
-      return this.setValidation(name, getValidationErrorMessage);
-    }
-
-    return new this.constructor(this._state
-      .setIn(['builderFunctions', '_getValidationErrorMessage', 'value'],
-        validators.combine([existingFn, getValidationErrorMessage]))
-      .updateIn(['builderFunctions', '_getValidationErrorMessage', 'name'],
-        oldName => (oldName ? `${oldName} ${name}` : name)));
   }
 
   /**
@@ -641,8 +638,8 @@ export default class BaseBuilder {
     return options
       .mergeDeep(fields)
       .get('options')
-      .merge(optionsFunctions.isEmpty() ? {} : optionsFunctions)
-      .merge(configFunctions.isEmpty() ? {} : { config: configFunctions })
+      .merge(optionsFunctions)
+      .mergeIn(['config'], configFunctions)
       .toJS();
   }
 }
