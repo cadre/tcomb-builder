@@ -8,7 +8,6 @@ describe('LazyTemplateInterface', () => {
     expect(() => constructWithGetters(LazyTemplateInterface, {
       checkbox: MockTemplateFactory,
       checkboxGroup: MockTemplateFactory,
-      dateTextField: MockTemplateFactory,
       dropDown: MockTemplateFactory,
       formPage: MockTemplateFactory,
       radio: MockTemplateFactory,
@@ -25,7 +24,6 @@ describe('LazyTemplateInterface', () => {
     expect(() => constructWithGetters(LazyTemplateInterface, {
       checkbox: MockTemplateFactory,
       checkboxGroup: MockTemplateFactory,
-      dateTextField: MockTemplateFactory,
       dropDown: MockTemplateFactory,
       formPage: MockTemplateFactory,
       radio: MockTemplateFactory,
