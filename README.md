@@ -2,9 +2,11 @@
 [![dependency status](https://img.shields.io/david/cadre/tcomb-builder.svg?style=flat-square)](https://david-dm.org/cadre/tcomb-builder)
 ![npm downloads](https://img.shields.io/npm/dm/tcomb-builder.svg?style=flat-square)
 
-# tcomb-builder
+# tcomb-builder 
 
 _tcomb-builder is an immutable interface for [tcomb-form](https://github.com/gcanti/tcomb-form)_
+
+Tcomb builder is deprecated. We will review and accept reasonable PRs, but we are not actively developing this project.
 
 ## Install
 
